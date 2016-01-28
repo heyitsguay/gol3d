@@ -1,0 +1,5 @@
+# Scripts to simplify Git updates.
+push
+
+# Vim/gedit backup files.
+*~
