@@ -22,7 +22,9 @@
  * Initializes the World running a 3D version of Conway's Game of Life.
  * @constructor
  */
-World::World() : io(IO::getInstance()) {};
+World::World() :
+        io(IO::getInstance()),
+        cam(Camera::getInstance()) {};
 
 /**
  * ~World()
@@ -110,7 +112,7 @@ void World::cubeCube(int hwidth, float p, glm::ivec3 center) {
  * @param t: Simulation time.
  * @param camPosition: Position of the Camera.
  */
-void World::draw(float t, glm::vec3 &camPosition) {
+void World::draw(float t) {
     float scale2 = 2 * scale;
 
     // Tracks the number of Cubes to draw.
@@ -124,10 +126,12 @@ void World::draw(float t, glm::vec3 &camPosition) {
     for(auto it = drawCubes.begin(); it != drawCubes.end(); ++it) {
         Cube *c = it->second;
         auto translation = glm::vec3(c->x * scale2, c->y * scale2, c->z * scale2);
-        glm::vec3 v_to_camera = translation - camPosition;
+        glm::vec3 v_to_camera = translation - cam.position;
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "IncompatibleTypes"
         float d2_to_camera = glm::dot(v_to_camera, v_to_camera);
-        // TODO: FIX THIS NEXT LINE ASAP.
-        if(d2_to_camera < 4000000.f) { // The literal should be a reference to a Camera property.
+#pragma clang diagnostic pop
+        if(d2_to_camera < cam.drawDistance * cam.drawDistance) {
             // Close enough to the Camera, should be drawn.
             translations.push_back(translation);
             scales.push_back(scale);
@@ -144,8 +148,8 @@ void World::draw(float t, glm::vec3 &camPosition) {
 
     // Draw.
     if(drawCount > 0) {
-        glUniformMatrix4fv(uMVP, 1, GL_FALSE, &(*MVP)[0][0]);
-        glUniform3fv(ucamera_pos, 1, &camPosition[0]);
+        glUniformMatrix4fv(uMVP, 1, GL_FALSE, &(cam.VP)[0][0]);
+        glUniform3fv(ucamera_pos, 1, &cam.position[0]);
         glUniform1f(ut, t);
 
         glBindBuffer(GL_ARRAY_BUFFER, translationVBO);
@@ -297,7 +301,6 @@ void World::handleInput() {
 void World::init(
         GLuint *cubeVAO_,
         GLuint *program_,
-        glm::mat4 *MVP_,
         float scale_,
         int frames_per_draw_,
         int maxCubes_,
@@ -307,8 +310,6 @@ void World::init(
     cubeVAO = cubeVAO_;
 
     program = program_;
-
-    MVP = MVP_;
 
     scale = scale_;
 

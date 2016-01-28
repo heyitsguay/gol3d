@@ -3,13 +3,14 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src/Camera.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/Skybox.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/load_obj.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/load_bmp.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Cube.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/load_shader.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/IO.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/World.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/load_bmp.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/load_obj.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Skybox.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/load_shader.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/User.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/main.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/cmake/FindSOIL.cmake" isTestSource="false" />

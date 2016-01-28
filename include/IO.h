@@ -12,7 +12,7 @@
 
 class IO {
 private:
-    IO(); // private constructor to allow only 1 instance.
+    IO(); // private constructor, allow only 1 instance.
 
     IO(IO const&); // prevent copies.
     void operator=(IO const&); // prevent assignments.

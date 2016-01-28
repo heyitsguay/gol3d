@@ -14,6 +14,7 @@
 
 #include <glm/glm.hpp>
 
+#include "Camera.h"
 #include "Cube.h"
 #include "IO.h"
 
@@ -30,6 +31,9 @@ private:
 
     // Reference to the IO handler.
     IO &io;
+
+    // Reference to the Camera
+    Camera &cam;
 
     // First part of the update cycle.
     void updateActiveCubes();
@@ -52,8 +56,7 @@ private:
     // Pointer to the World shader program.
     GLuint *program;
 
-    // Pointer to the MVP matrix.
-    glm::mat4 *MVP;
+
 
 public:
     // World state.
@@ -114,7 +117,7 @@ public:
 
     void cubeCube(int hwidth = 10, float p = 0.1, glm::ivec3 center = glm::ivec3(0,0,0));
 
-    void draw(float t, glm::vec3 &camPosition);
+    void draw(float t);
 
     bool findActiveCubes(long int idx);
 
@@ -129,7 +132,6 @@ public:
     void init(
             GLuint *cubeVAO_,
             GLuint *program_,
-            glm::mat4 *MVP_,
             float scale_=1.f,
             int frames_per_draw_=10,
             int maxCubes_=4000000,

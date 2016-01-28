@@ -15,6 +15,8 @@
 
 #include "Camera.h"
 #include "Skybox.h"
+#include "User.h"
+
 #include "load_obj.h"
 #include "opengl-debug.h"
 
@@ -26,10 +28,6 @@ S3/B4: Similar to S9/B4 but with a paired linear puffer.
 // GOL rules.
 int stay_arr[] = {9};
 int born_arr[] = {4};
-
-// Time scale.
-float t = 0;
-float dt = 0.01;
 
 // Spatial scale.
 float scale = 0.5f;
@@ -61,7 +59,6 @@ int main() {
     const GLFWvidmode *mode = glfwGetVideoMode(useMonitor);
     int window_width = mode->width;
     int window_height = mode->height;
-    float ratio = float(window_width) / float(window_height);
 
     GLFWwindow* window;
     window = glfwCreateWindow(window_width, window_height, " ", useMonitor, NULL);
@@ -131,41 +128,6 @@ int main() {
     );
     glEnableVertexAttribArray(1);
 
-//    // Needed for translation data.
-//    std::vector<glm::vec3> translations;
-//    translations.reserve(maxCubes / 64);
-//    // Create a translation VBO.
-//    GLuint translationbuffer;
-//    glGenBuffers(1, &translationbuffer);
-//    glBindBuffer(GL_ARRAY_BUFFER, translationbuffer);
-//    glVertexAttribPointer(
-//            2, // attribute number.
-//            3, // size
-//            GL_FLOAT, // type
-//            GL_FALSE, // normalized?
-//            0, // stride
-//            (void*)0 // offset pointer.
-//    );
-//    glVertexAttribDivisor(2, (GLuint)1);
-//    glEnableVertexAttribArray(2);
-//
-//    // Cube scaling data.
-//    std::vector<float> scales;
-//    scales.reserve(maxCubes / 64);
-//    // Create a scale VBO.
-//    GLuint scalebuffer;
-//    glGenBuffers(1, &scalebuffer);
-//    glBindBuffer(GL_ARRAY_BUFFER, scalebuffer);
-//    glVertexAttribPointer(
-//            3,
-//            1,
-//            GL_FLOAT,
-//            GL_FALSE,
-//            0,
-//            (void*)0
-//    );
-//    glVertexAttribDivisor(3, (GLuint)1);
-//    glEnableVertexAttribArray(3);
 
     // Load shaders.
     GLuint SP_world = LoadShaders("../glsl/world.vert", "../glsl/world.frag");
@@ -177,16 +139,6 @@ int main() {
 
     // MVP matrix.
     glm::mat4 MVP;
-
-//    // Uniform handles for SP_world.
-//    // Handle for the SP_world MVP uniform.
-//    GLuint uMVP_world = (GLuint) glGetUniformLocation(SP_world, "u_MVP");
-//    // Handle for the SP_world M uniform.
-////    GLuint uM_world = (GLuint) glGetUniformLocation(SP_world, "u_M");
-//    // Handle for the SP_world t uniform.
-//    GLuint ut_world = (GLuint) glGetUniformLocation(SP_world, "u_t");
-//    // Handle for the camera_position uniform.
-//    GLuint ucamera_pos_world = (GLuint) glGetUniformLocation(SP_world, "u_camera_pos");
 
     // Uniform handles for SP_cursor.
     // Handle for the MVP uniform.
@@ -216,16 +168,21 @@ int main() {
     int frames_per_draw = 10;
     // The World.
     auto world = World();
-    world.init(&CubeVAO, &SP_world, &MVP, scale, frames_per_draw, maxCubes);
+    world.init(&CubeVAO, &SP_world, scale, frames_per_draw, maxCubes);
     world.setRule(stay, born);
     // Initialize to have some randomly-activated Cubes.
     world.cubeCube(hwidth, 0.1);
 
     // Camera setup
-    auto cam = Camera();
-    cam.init(window, &world, ratio);
+    Camera &cam = Camera::getInstance();
+    cam.init();
 
-    printf("Using OpenGL %s\n", glGetString(GL_VERSION));
+    // User setup.
+    glm::vec3 position0(0, 0, 80);
+    float horizontalAngle0 = (float)PI;
+    float verticalAngle0 = 0.f;
+    auto user = User();
+    user.init(&world, position0, horizontalAngle0, verticalAngle0);
 
     // Skybox setup. MUST come after Camera setup.
     const float skyscale = 10000.f;
@@ -237,21 +194,24 @@ int main() {
     while(!glfwWindowShouldClose(window)) {
 
         // Frame rate stuff.
-        double currentTime = glfwGetTime();
+        double t = glfwGetTime();
         nbFrames++;
-        if(currentTime - lastTime >= 1.0) {
+        if(t - lastTime >= 1.0) {
 //            printf("%f ms/frame\n", 1000./double(nbFrames));
             nbFrames = 0;
             lastTime += 1.0;
         }
 
         // Simulated time.
-        t = (float)std::fmod(t+dt, 1000.);
+//        t = (float)std::fmod(t+dt, 1000.);
 
         // Check for a program exit.
         if(io.pressed(GLFW_KEY_ESCAPE)) {
             glfwSetWindowShouldClose(window, GL_TRUE);
         }
+
+        // Update the User.
+        user.update(t);
 
         // Update the World.
         world.update();
@@ -260,79 +220,15 @@ int main() {
         cam.update();
 
         // Can compute MVP and camera_pos uniforms.
-        MVP = cam.Projection * cam.View;
+        MVP = cam.VP;
 
         float dcube = 2.f * world.scale;
         glm::vec3 vscale(world.scale, world.scale, world.scale);
 
-//        translations.clear();
-//        scales.clear();
-
-        // Counts the number of drawn Cubes.
-//        int drawCount = 0;
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        world.draw(t, cam.position);
-
-//        // Disable blend.
-//        glDisable(GL_BLEND);
-//
-//        // Enable depth test
-//        glEnable(GL_DEPTH_TEST);
-//
-//        // Enable backface culling
-//        glEnable(GL_CULL_FACE);
-//
-//        // Use a shader.
-//        glUseProgram(SP_world);
-//
-//        // Iterate through activeCubes, drawing all the active Cubes.
-//        for(auto it = world.drawCubes.begin(); it != world.drawCubes.end(); ++it) {
-//            Cube *c = it->second;
-//
-//            // Draw if it's alive.
-//            if(c->live) {
-//                // Calculate the translation vector
-//                auto translation = glm::vec3(c->x * dcube, c->y * dcube, c->z * dcube);
-//                glm::vec3 v_to_camera = translation - cam.position;
-//                float d2_to_camera = glm::dot(v_to_camera, v_to_camera);
-//                if(d2_to_camera < cam.drawDistance * cam.drawDistance) {
-//
-//                    translations.push_back(translation);
-//                    scales.push_back(scale);
-//
-//                    drawCount++;
-//                }
-//            } else {
-//                printf("Something's wrong with drawCubes.\n");
-//            }
-//        }
-//
-//        if(drawCount > 0) {
-//            GL_CHECK( glUniformMatrix4fv(uMVP_world, 1, GL_FALSE, &MVP[0][0]) );
-//            glUniform3fv(ucamera_pos_world, 1, &cam.position[0]);
-//            glUniform1f(ut_world, t);
-//
-//            glBindBuffer(GL_ARRAY_BUFFER, translationbuffer);
-//            glBufferData(GL_ARRAY_BUFFER,
-//                         sizeof(glm::vec3) * drawCount,
-//                         &translations[0][0],
-//                         GL_DYNAMIC_DRAW);
-//
-//            glBindBuffer(GL_ARRAY_BUFFER, scalebuffer);
-//            glBufferData(GL_ARRAY_BUFFER,
-//                         sizeof(float) * drawCount,
-//                         &scales[0],
-//                         GL_DYNAMIC_DRAW);
-//
-//            GL_CHECK( glDrawArraysInstanced(GL_TRIANGLES,
-//                                            0,
-//                                            (GLsizei)g_vertices.size(),
-//                                            (GLsizei)drawCount
-//
-//            ) );
-//        }
+        world.draw((float)t);
 
         // Draw the skybox.
         skybox.draw();
@@ -345,12 +241,12 @@ int main() {
             glDisable(GL_CULL_FACE);
             glUseProgram(SP_cursor);
 
-            auto translation = glm::vec3(cam.drawCursor.x * dcube,
-                                         cam.drawCursor.y * dcube,
-                                         cam.drawCursor.z * dcube);
+            auto translation = glm::vec3(user.drawCursor.x * dcube,
+                                         user.drawCursor.y * dcube,
+                                         user.drawCursor.z * dcube);
 
             glm::mat4 translatedModel = glm::scale(glm::translate(Model, translation), vscale);
-            glm::mat4 MVP2 = cam.Projection * cam.View * translatedModel;
+            glm::mat4 MVP2 = cam.VP * translatedModel;
 
             glUniformMatrix4fv(uMVP_cursor, 1, GL_FALSE, &MVP2[0][0]);
 
@@ -373,8 +269,6 @@ int main() {
     // Cleanup VBO and shader
     glDeleteBuffers(1, &vertexbuffer);
     glDeleteBuffers(1, &normalbuffer);
-//    glDeleteBuffers(1, &translationbuffer);
-//    glDeleteBuffers(1, &scalebuffer);
     glDeleteProgram(SP_world);
     glDeleteProgram(SP_cursor);
     glDeleteProgram(SP_skybox);
