@@ -46,6 +46,15 @@ private:
     // Tracks the number of updates needed to advance the World one step.
     int stepCounter = 0;
 
+    // Pointer to the main Cube VAO.
+    GLuint *cubeVAO;
+
+    // Pointer to the World shader program.
+    GLuint *program;
+
+    // Pointer to the MVP matrix.
+    glm::mat4 *MVP;
+
 public:
     // World state.
     State state;
@@ -87,12 +96,25 @@ public:
     // Spatial scale of the Cubes.
     float scale;
 
+    // Arrays containing drawn Cube translation and scaling info.
+    std::vector<glm::vec3> translations;
+    std::vector<float> scales;
+
+    // OpenGL uniform variables.
+    GLuint uMVP, ucamera_pos, ut;
+
+    // OpenGL VBOs for translation and scaling info.
+    GLuint translationVBO, scaleVBO;
+
+
     World();
     ~World();
 
     void add(int x, int y, int z);
 
     void cubeCube(int hwidth = 10, float p = 0.1, glm::ivec3 center = glm::ivec3(0,0,0));
+
+    void draw(float t, glm::vec3 &camPosition);
 
     bool findActiveCubes(long int idx);
 
@@ -105,19 +127,24 @@ public:
     void handleInput();
 
     void init(
-            std::vector<int> stay_vals,
-            std::vector<int> born_vals,
+            GLuint *cubeVAO_,
+            GLuint *program_,
+            glm::mat4 *MVP_,
             float scale_=1.f,
-            int frames_per_draw_=4,
+            int frames_per_draw_=10,
             int maxCubes_=4000000,
             int bound_=10000
     );
+
+    void initGL();
 
     long int key(int x, int y, int z);
 
     void remove(long int idx);
 
     void reset();
+
+    void setRule(std::vector<int> stay_vals, std::vector<int> born_vals);
 
     void update();
 };

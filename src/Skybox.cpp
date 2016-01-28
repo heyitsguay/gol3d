@@ -25,7 +25,7 @@ void Skybox::draw() {
         glEnable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
         glDepthMask(GL_FALSE);
-        glUseProgram(program);
+        glUseProgram(*program);
 
         // Translated and scaled model matrix.
         glm::mat4 Mts = glm::scale(glm::translate(M, cam->position), scaleVec);
@@ -66,7 +66,7 @@ void Skybox::handleInput() {
  * @param scale_: Spatial scale of the rendered Skybox.
  * @param useHD: If true, use the HD Skybox texture.
  */
-void Skybox::init(GLuint program_, Camera *cam_, float scale_, bool useHD) {
+void Skybox::init(GLuint *program_, Camera *cam_, float scale_, bool useHD) {
     program = program_;
     cam = cam_;
     scale = scale_;
@@ -95,7 +95,7 @@ void Skybox::init(GLuint program_, Camera *cam_, float scale_, bool useHD) {
         tex = loadCubemap(lowNames);
     }
 
-    uMVP = (GLuint) glGetUniformLocation(program, "u_MVP");
+    uMVP = (GLuint) glGetUniformLocation(*program, "u_MVP");
 }
 
 GLuint Skybox::loadCubemap(std::vector<const GLchar*> faces)

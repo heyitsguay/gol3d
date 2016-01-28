@@ -39,7 +39,7 @@ public:
     GLuint tex;
 
     // ID to the Skybox's shader program.
-    GLuint program;
+    GLuint *program;
 
     // ID to the Skybox's MVP uniform.
     GLuint uMVP;
@@ -58,7 +58,7 @@ public:
 
     Skybox();
 
-    void init(GLuint program_,
+    void init(GLuint *program_,
               Camera *cam_,
               float scale_=10000.f,
               bool useHD = true);

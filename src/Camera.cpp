@@ -25,40 +25,6 @@ Camera::Camera() : io(IO::getInstance()){
 Camera::~Camera() {}
 
 /**
- * Camera.init()
- * Initializes the Camera object.
- * @param window_: Pointer to the GLFW window.
- * @param world_: Pointer to the GOL World.
- * @param ratio: Window aspect ratio.
- */
-void Camera::init(GLFWwindow *window_, World *world_, float ratio) {
-
-    drawDistance = 2000.f;
-
-    // Create the Projection matrix.
-    Projection = glm::perspective(fov, ratio, 0.1f, drawDistance);
-
-    lastTime = 0.f;
-    currentTime = 0.f;
-    window = window_;
-    world = world_;
-    speed = 0.f;
-
-    up = glm::vec3(0, 0, 0);
-    right = glm::vec3(0, 0, 0);
-
-    drawOffset = glm::vec3(0, 0, 0);
-    drawCursor = glm::ivec3(0, 0, 0);
-
-    drawToggle = true;
-    drawStart = false;
-    drawLive = false;
-    drawDead = false;
-
-    cubeHwidth = 4;
-}
-
-/**
  * Camera.handleInput()
  * Handles user input (currently just key presses).
  */
@@ -193,6 +159,40 @@ void Camera::handleInput() {
             cubeHwidth = 1;
         }
     }
+}
+
+/**
+ * Camera.init()
+ * Initializes the Camera object.
+ * @param window_: Pointer to the GLFW window.
+ * @param world_: Pointer to the GOL World.
+ * @param ratio: Window aspect ratio.
+ */
+void Camera::init(GLFWwindow *window_, World *world_, float ratio) {
+
+    drawDistance = 2000.f;
+
+    // Create the Projection matrix.
+    Projection = glm::perspective(fov, ratio, 0.1f, drawDistance);
+
+    lastTime = 0.f;
+    currentTime = 0.f;
+    window = window_;
+    world = world_;
+    speed = 0.f;
+
+    up = glm::vec3(0, 0, 0);
+    right = glm::vec3(0, 0, 0);
+
+    drawOffset = glm::vec3(0, 0, 0);
+    drawCursor = glm::ivec3(0, 0, 0);
+
+    drawToggle = true;
+    drawStart = false;
+    drawLive = false;
+    drawDead = false;
+
+    cubeHwidth = 4;
 }
 
 /**

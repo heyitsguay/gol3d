@@ -9,13 +9,13 @@
 #include <tuple>
 #include <unordered_map>
 
+#include <GL/glew.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
+
 #include "Cube.h"
 #include "World.h"
-
-//void clear(std::queue<Cube*> q) {
-//    std::queue<Cube*> em;
-//    std::swap(q, em);
-//}
 
 /**
  * World()
@@ -30,6 +30,12 @@ World::World() : io(IO::getInstance()) {};
  */
 World::~World() {
     freeMemory();
+
+    glDisableVertexAttribArray(2);
+    glDisableVertexAttribArray(3);
+
+    glDeleteBuffers(1, &translationVBO);
+    glDeleteBuffers(1, &scaleVBO);
 };
 
 /**
@@ -96,6 +102,67 @@ void World::cubeCube(int hwidth, float p, glm::ivec3 center) {
             }
         }
     }
+}
+
+/**
+ * World.draw()
+ * Draws the World.
+ * @param t: Simulation time.
+ * @param camPosition: Position of the Camera.
+ */
+void World::draw(float t, glm::vec3 &camPosition) {
+    float scale2 = 2 * scale;
+
+    // Tracks the number of Cubes to draw.
+    int drawCount = 0;
+
+    // Clear the translation and scale data arrays.
+    translations.clear();
+    scales.clear();
+
+    // Update drawn Cube translation and scale info.
+    for(auto it = drawCubes.begin(); it != drawCubes.end(); ++it) {
+        Cube *c = it->second;
+        auto translation = glm::vec3(c->x * scale2, c->y * scale2, c->z * scale2);
+        glm::vec3 v_to_camera = translation - camPosition;
+        float d2_to_camera = glm::dot(v_to_camera, v_to_camera);
+        // TODO: FIX THIS NEXT LINE ASAP.
+        if(d2_to_camera < 4000000.f) { // The literal should be a reference to a Camera property.
+            // Close enough to the Camera, should be drawn.
+            translations.push_back(translation);
+            scales.push_back(scale);
+
+            drawCount++;
+        }
+    }
+
+    // Prepare to draw.
+    glDisable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glUseProgram(*program);
+
+    // Draw.
+    if(drawCount > 0) {
+        glUniformMatrix4fv(uMVP, 1, GL_FALSE, &(*MVP)[0][0]);
+        glUniform3fv(ucamera_pos, 1, &camPosition[0]);
+        glUniform1f(ut, t);
+
+        glBindBuffer(GL_ARRAY_BUFFER, translationVBO);
+        glBufferData(GL_ARRAY_BUFFER,
+                     sizeof(glm::vec3) * drawCount,
+                     &translations[0][0],
+                     GL_DYNAMIC_DRAW);
+
+        glBindBuffer(GL_ARRAY_BUFFER, scaleVBO);
+        glBufferData(GL_ARRAY_BUFFER,
+                     sizeof(float) * drawCount,
+                     &scales[0],
+                     GL_DYNAMIC_DRAW);
+
+        glDrawArraysInstanced(GL_TRIANGLES, 0, 36, (GLsizei)drawCount);
+    }
+
 }
 
 /**
@@ -219,31 +286,29 @@ void World::handleInput() {
 /**
  * World.init()
  * Initializes the World.
- * @param stay_vals: Indicates which indices of stay[] to make true.
- * @param born_vals: Indicates which indices of born[] to make true.
+ * @param cubeVAO_: Pointer to the main cube VAO.
+ * @param program_: Pointer to the ID of the World's shader program.
+ * @param MVP_: Pointer to the Model-View-Projection matrix.
+ * @param scale_: Spatial scale of the World's Cubes.
+ * @param frames_per_draw_: Number of frames that the World's update cycle takes.
  * @param maxCubes_: Maximum number of simultaneously active Cubes.
  * @param bound_: Cubes are constrained to lie in the box [-bound_, bound_]^3.
  */
 void World::init(
-        std::vector<int> stay_vals,
-        std::vector<int> born_vals,
+        GLuint *cubeVAO_,
+        GLuint *program_,
+        glm::mat4 *MVP_,
         float scale_,
         int frames_per_draw_,
         int maxCubes_,
         int bound_
     ) {
 
-    // Rule setup.
-    for(auto& s : stay_vals) {
-        if(s >= 0 && s < 27) {
-            stay[s] = true;
-        }
-    }
-    for(auto& b : born_vals) {
-        if(b >= 0 && b < 27) {
-            born[b] = true;
-        }
-    }
+    cubeVAO = cubeVAO_;
+
+    program = program_;
+
+    MVP = MVP_;
 
     scale = scale_;
 
@@ -251,12 +316,56 @@ void World::init(
 
     maxCubes = maxCubes_;
 
-    // Cube boundary value.
     bound = bound_;
 
     state = stop;
 
+    initGL();
+
     reset();
+}
+
+/**
+ * World.initGL()
+ * Initializes the OpenGL elements associated with the World.
+ */
+void World::initGL() {
+    // Set up the translation and scale data arrays.
+    translations.reserve((unsigned long)maxCubes / 64);
+    scales.reserve((unsigned long)maxCubes / 64);
+
+    // Get GLSL uniform pointers.
+    uMVP = (GLuint) glGetUniformLocation(*program, "u_MVP");
+    ucamera_pos = (GLuint) glGetUniformLocation(*program, "u_camera_pos");
+    ut = (GLuint) glGetUniformLocation(*program, "ut");
+
+    // Create the translation VBO.
+    glGenBuffers(1, &translationVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, translationVBO);
+    glVertexAttribPointer(
+            2, // attribute number.
+            3, // size
+            GL_FLOAT, // type
+            GL_FALSE, // normalized?
+            0, // stride
+            (void*)0 // offset pointer.
+    );
+    glVertexAttribDivisor(2, (GLuint)1);
+    glEnableVertexAttribArray(2);
+
+    // Create the scale VBO.
+    glGenBuffers(1, &scaleVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, scaleVBO);
+    glVertexAttribPointer(
+            3,
+            1,
+            GL_FLOAT,
+            GL_FALSE,
+            0,
+            (void*)0
+    );
+    glVertexAttribDivisor(3, (GLuint)1);
+    glEnableVertexAttribArray(3);
 }
 
 /**
@@ -314,6 +423,32 @@ void World::reset() {
 
     // Number of active Cubes.
     nCubes = 0;
+}
+
+/**
+ * World.setRule()
+ * Sets the update rule for the Cube states.
+ * @param stay_vals: A live Cube stays live if its live neighbor count is an element of this vector.
+ * @param born_vals: A dead Cube becomes live if its live neighbor count is an element of this vector.
+ */
+void World::setRule(std::vector<int> stay_vals, std::vector<int> born_vals) {
+    // Reset the rule arrays.
+    for(int i = 0; i < 27; ++i) {
+        stay[i] = false;
+        born[i] = false;
+    }
+
+    // Rule setup.
+    for(auto& s : stay_vals) {
+        if(s >= 0 && s < 27) {
+            stay[s] = true;
+        }
+    }
+    for(auto& b : born_vals) {
+        if(b >= 0 && b < 27) {
+            born[b] = true;
+        }
+    }
 }
 
 /**
