@@ -2,13 +2,9 @@
 // Created by mattguay on 1/24/16.
 //
 
-#ifndef PLAYGROUND_CAMERA_H
-#define PLAYGROUND_CAMERA_H
+#ifndef GOL3D_CAMERA_H
+#define GOL3D_CAMERA_H
 #pragma once
-
-#include <vector>
-
-#include <GLFW/glfw3.h>
 
 #include <glm/glm.hpp>
 
@@ -65,4 +61,4 @@ public:
     void update();
 };
 
-#endif //PLAYGROUND_CAMERA_H
+#endif //GOL3D_CAMERA_H

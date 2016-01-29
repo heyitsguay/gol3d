@@ -2,8 +2,8 @@
 // Created by matt on 1/26/16.
 //
 
-#ifndef PLAYGROUND_IO_H
-#define PLAYGROUND_IO_H
+#ifndef GOL3D_IO_H
+#define GOL3D_IO_H
 #pragma once
 
 #include <GLFW/glfw3.h>
@@ -56,4 +56,4 @@ public:
     bool toggled(int key);
 };
 
-#endif //PLAYGROUND_IO_H
+#endif //GOL3D_IO_H

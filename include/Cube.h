@@ -2,8 +2,8 @@
 // Created by mattguay on 1/23/16.
 //
 
-#ifndef PLAYGROUND_CUBE_H
-#define PLAYGROUND_CUBE_H
+#ifndef GOL3D_CUBE_H
+#define GOL3D_CUBE_H
 #pragma once
 
 #include <tuple>
@@ -33,4 +33,4 @@ public:
     void setup(int x_, int y_, int z_, bool live_=false);
 };
 
-#endif //PLAYGROUND_CUBE_H
+#endif //GOL3D_CUBE_H

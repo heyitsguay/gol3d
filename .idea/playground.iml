@@ -10,6 +10,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/World.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Skybox.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/load_shader.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Framework.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/User.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/main.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />

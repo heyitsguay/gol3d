@@ -11,6 +11,10 @@ std::vector<const GLchar*> lowNames, highNames;
 
 Skybox::Skybox() : io(IO::getInstance()) {};
 
+Skybox::~Skybox() {
+    glDeleteTextures(1, &tex);
+}
+
 /**
  * Skybox.draw()
  * Draws the Skybox using OpenGL.
@@ -105,16 +109,17 @@ GLuint Skybox::loadCubemap(std::vector<const GLchar*> faces)
     glActiveTexture(GL_TEXTURE0);
 
     int width,height;
-    unsigned char* image;
+//    unsigned char* image;
 
     glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
     for(GLuint i = 0; i < faces.size(); i++)
     {
-        image = SOIL_load_image(faces[i], &width, &height, 0, SOIL_LOAD_RGB);
+        unsigned char *image = SOIL_load_image(faces[i], &width, &height, 0, SOIL_LOAD_RGB);
         glTexImage2D(
                 GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
                 GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image
         );
+        SOIL_free_image_data(image);
     }
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

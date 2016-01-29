@@ -2,8 +2,8 @@
 // Created by mattguay on 1/26/16.
 //
 
-#ifndef PLAYGROUND_OPENGL_DEBUG_H
-#define PLAYGROUND_OPENGL_DEBUG_H
+#ifndef GOL3D_OPENGL_DEBUG_H
+#define GOL3D_OPENGL_DEBUG_H
 #pragma once
 
 void CheckOpenGLError(const char* stmt, const char* fname, int line)
@@ -16,7 +16,7 @@ void CheckOpenGLError(const char* stmt, const char* fname, int line)
     }
 }
 
-#ifdef _DEBUG
+#ifdef _GLDEBUG
 #define GL_CHECK(stmt) do { \
             stmt; \
             CheckOpenGLError(#stmt, __FILE__, __LINE__); \
@@ -25,4 +25,4 @@ void CheckOpenGLError(const char* stmt, const char* fname, int line)
 #define GL_CHECK(stmt) stmt
 #endif
 
-#endif //PLAYGROUND_OPENGL_DEBUG_H
+#endif //GOL3D_OPENGL_DEBUG_H

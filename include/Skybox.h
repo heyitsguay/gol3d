@@ -2,8 +2,8 @@
 // Created by matt on 1/26/16.
 //
 
-#ifndef PLAYGROUND_SKYBOX_H
-#define PLAYGROUND_SKYBOX_H
+#ifndef GOL3D_SKYBOX_H
+#define GOL3D_SKYBOX_H
 #pragma once
 
 #include <vector>
@@ -58,6 +58,8 @@ public:
 
     Skybox();
 
+    ~Skybox();
+
     void init(GLuint *program_,
               Camera *cam_,
               float scale_=10000.f,
@@ -67,4 +69,4 @@ public:
 
 };
 
-#endif //PLAYGROUND_SKYBOX_H
+#endif //GOL3D_SKYBOX_H

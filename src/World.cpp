@@ -114,7 +114,7 @@ void World::cubeCube(int hwidth, float p, glm::ivec3 center) {
  */
 void World::draw(float t) {
     // Tracks the number of Cubes to draw.
-    int drawCount = 0;
+    drawCount = 0;
 
     // Clear the translation and scale data arrays.
     translations.clear();
@@ -238,10 +238,11 @@ void World::flip(Cube *c) {
  */
 void World::freeMemory() {
 // Delete Cubes in the limbo queue.
-    for(int i = 0; i < limbo.size(); ++i) {
+    auto ls = (int)limbo.size();
+    for(int i = 0; i < ls; ++i) {
         Cube *c = limbo.front();
-        limbo.pop();
         delete c;
+        limbo.pop();
     }
 
     // Delete Cubes in activeCubes.

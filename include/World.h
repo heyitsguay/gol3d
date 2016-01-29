@@ -2,8 +2,8 @@
 // Created by mattguay on 1/23/16.
 //
 
-#ifndef PLAYGROUND_WORLD_H
-#define PLAYGROUND_WORLD_H
+#ifndef GOL3D_WORLD_H
+#define GOL3D_WORLD_H
 #pragma once
 
 #include <queue>
@@ -112,6 +112,9 @@ public:
     // OpenGL VBOs for translation and scaling info.
     GLuint translationVBO, scaleVBO;
 
+    // Counts the actual number of Cubes drawn each frame.
+    int drawCount = 0;
+
 
     World();
     ~World();
@@ -155,4 +158,4 @@ public:
 };
 
 
-#endif //PLAYGROUND_WORLD_H
+#endif //GOL3D_WORLD_H
