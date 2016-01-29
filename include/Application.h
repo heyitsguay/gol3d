@@ -2,8 +2,8 @@
 // Created by matt on 1/28/16.
 //
 
-#ifndef GOL3D_FRAMEWORK_H
-#define GOL3D_FRAMEWORK_H
+#ifndef GOL3D_APPLICATION_H
+#define GOL3D_APPLICATION_H
 #pragma once
 
 //#define _GLDEBUG
@@ -17,18 +17,33 @@
 #include "Skybox.h"
 #include "User.h"
 
-// Framework for the GOL3D application.
-class Framework {
+// Aliases for quality levels.
+#define QUALITY_LOW 0 // Currently doesn't work.
+#define QUALITY_MEDIUM 1 // Currently doesn't work.
+#define QUALITY_HIGH 2
+#define QUALITY_LAPTOP -1 // Just for my little 1366x768 laptop.
+
+// The application.
+class Application {
 private:
-    Framework();
-    Framework(Framework const&);
+    Application();
+    Application(Application const&);
     void operator=(Camera const&);
 
-    // When true, the Framework prints performance info.
+    // When true, the Application prints performance info.
     bool printPerfInfo = false;
+
+    void freeGL();
+
+    void handleInput();
+
+    void initGL(int monitorID, int quality, int aaSamples);
+
+    void perfInfo();
+
 public:
-    static Framework &getInstance() {
-        static Framework instance;
+    static Application &getInstance() {
+        static Application instance;
         return instance;
     }
 
@@ -73,17 +88,11 @@ public:
 
     void draw();
 
-    void freeGL();
+    void init(int monitorID=0, int quality=QUALITY_HIGH, int aaSamples=2);
 
-    void handleInput();
-
-    void init();
-
-    void initGL();
-
-    void perfInfo();
+    void terminate();
 
     void update();
 };
 
-#endif //GOL3D_FRAMEWORK_H
+#endif //GOL3D_APPLICATION_H

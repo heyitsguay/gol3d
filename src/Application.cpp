@@ -1,7 +1,7 @@
 //
 // Created by matt on 1/28/16.
 //
-#include "Framework.h"
+#include "Application.h"
 
 #include <GL/glxew.h>
 
@@ -17,15 +17,15 @@ const float scale = 0.5f;
 // World frames per update cycle.
 const int framesPerCycle = 10;
 
-Framework::Framework() :
+Application::Application() :
         io(IO::getInstance()),
         cam(Camera::getInstance()) {}
 
 /**
- * Framework.draw()
- * Draws all the parts of the application.
+ * Application.draw()
+ * Draws all the components of the application.
  */
-void Framework::draw() {
+void Application::draw() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     world.draw((float)t);
@@ -40,10 +40,10 @@ void Framework::draw() {
 }
 
 /**
- * Framework.freeGL()
+ * Application.freeGL()
  * Frees allocated OpenGL resources.
  */
-void Framework::freeGL() {
+void Application::freeGL() {
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
     glDeleteBuffers(1, &vertexVBO);
@@ -55,28 +55,31 @@ void Framework::freeGL() {
 }
 
 /**
- * Framework.handleInput()
- * Handle user input to the Framework.
+ * Application.handleInput()
+ * Handle user input to the Application.
  */
-void Framework::handleInput() {
+void Application::handleInput() {
     // Check for an application exit.
     if(io.pressed(GLFW_KEY_ESCAPE)) {
         glfwSetWindowShouldClose(window, GL_TRUE);
     }
 
-    // Set the Framework up to print performance info.
+    // Set the Application up to print performance info.
     if(io.toggled(GLFW_KEY_B)) {
         printPerfInfo = true;
     }
 }
 
 /**
- * Framework.init()
+ * Application.init()
  * Initializes the OpenGL resources and application objects.
+ * @param monitorID: Indicates which monitor to use.
+ * @param quality: Indicates the graphics quality.
+ * @param aaSamples: Number of samples to use for multisampling (antialiasing).
  */
-void Framework::init() {
+void Application::init(int monitorID, int quality, int aaSamples) {
     // Initialize OpenGL resources.
-    initGL();
+    initGL(monitorID, quality, aaSamples);
 
     // I/O handler setup.
     io.init(window);
@@ -103,10 +106,11 @@ void Framework::init() {
 }
 
 /**
- * Framework.initGL()
+ * Application.initGL()
  * Initializes the OpenGL resources needed for the application.
+ * Parameters are the same as in Application.init().
  */
-void Framework::initGL() {
+void Application::initGL(int monitorID, int quality, int aaSamples) {
     // Initialize GLFW.
     if(!glfwInit()) {
         printf("Failed to initialize GLFW\n");
@@ -119,17 +123,45 @@ void Framework::initGL() {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    // Antialiasing.
-    glfwWindowHint(GLFW_SAMPLES, 2);
+    // Antialiasing. Only allow 2x, 4x, 8x multisampling - all other
+    // values result in multisampling being disabled.
+    if(aaSamples == 2 || aaSamples == 4 || aaSamples == 8) {
+        glfwWindowHint(GLFW_SAMPLES, aaSamples);
+    } else {
+        glfwWindowHint(GLFW_SAMPLES, 0);
+    }
 
-    // Get monitor info. Use the secondary monitor if it's available.
+    // Get monitor info. Use the monitor indicated by monitorID if available,
+    // otherwise use the primary monitor.
     int count;
-    GLFWmonitor** monitors = glfwGetMonitors(&count);
-    GLFWmonitor* useMonitor = monitors[count-1];
-    // Calculate monitor resolution.
+    GLFWmonitor **monitors = glfwGetMonitors(&count);
+    GLFWmonitor *useMonitor;
+    if(monitorID < count) {
+        useMonitor = monitors[monitorID];
+    } else {
+        useMonitor = monitors[0];
+    }
+
+    // Calculate logical window size. If input (quality) is a valid value
+    // (see the top of Application.h for value aliases), adjust the resolution
+    // accordingly, else just use the monitor resolution.
     const GLFWvidmode *mode = glfwGetVideoMode(useMonitor);
-    int window_width = mode->width;
-    int window_height = mode->height;
+    // Monitor resolution.
+    int xResolution = mode->width;
+    int yResolution = mode->height;
+
+    int window_width, window_height;
+
+    if(quality == QUALITY_LAPTOP) {
+        // Always 1366x768, a personal indulgence.
+        window_width = 1366;
+        window_height = 768;
+
+    } else {
+        // 100% scale. Ideally, you selected QUALITY_BEST to get here.
+        window_width = xResolution;
+        window_height = yResolution;
+    }
 
     // Create the GLFW window, make its context current.
     window = glfwCreateWindow(window_width, window_height, " ", useMonitor, NULL);
@@ -154,11 +186,13 @@ void Framework::initGL() {
     // Disable the cursor.
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    // Set up vsync.
-    Display *dpy = glXGetCurrentDisplay();
-    GLXDrawable drawable = glXGetCurrentDrawable();
-    if(drawable) {
-        glXSwapIntervalEXT(dpy, drawable, 1);
+    // Set up vsync if available.
+    if(GLXEW_EXT_swap_control) {
+        Display *dpy = glXGetCurrentDisplay();
+        GLXDrawable drawable = glXGetCurrentDrawable();
+        if (drawable) {
+            glXSwapIntervalEXT(dpy, drawable, 1);
+        }
     }
 
     // Set initial clear color to black.
@@ -219,11 +253,11 @@ void Framework::initGL() {
 }
 
 /**
- * Framework.perfInfo()
+ * Application.perfInfo()
  * Calculates performance info (framerate, number of Cubes, etc.)
  * @param display: If true, prints the performance info.
  */
-void Framework::perfInfo() {
+void Application::perfInfo() {
     static double lastTime = 0;
     static int numFrames = 0;
     static float frameRate = 0;
@@ -245,10 +279,19 @@ void Framework::perfInfo() {
 }
 
 /**
- * Framework.update()
+ * Application.terminate()
+ * Runs the application shutdown processes.
+ */
+void Application::terminate() {
+    // Just frees OpenGL object memory for now.
+    freeGL();
+}
+
+/**
+ * Application.update()
  * Updates the application objects.
  */
-void Framework::update() {
+void Application::update() {
     // Update the time variable.
     t = glfwGetTime();
 

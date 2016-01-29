@@ -12,7 +12,7 @@ bool load_obj(
         std::vector<glm::vec3> &out_vertices,
         std::vector<glm::vec3> &out_normals
 ) {
-    printf("Loading OBJ file %s...\n", path);
+//    printf("Loading OBJ file %s...\n", path);
 
     std::vector<unsigned int> vertexIndices, normalIndices;
     std::vector<glm::vec3> temp_vertices;

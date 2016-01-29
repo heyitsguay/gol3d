@@ -17,7 +17,7 @@ set(SOURCE_FILES
         src/IO.cpp
         src/Skybox.cpp
         src/User.cpp
-        src/Framework.cpp
+        src/Application.cpp
     )
 add_executable(gol3d ${SOURCE_FILES})
 
