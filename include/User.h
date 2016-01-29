@@ -6,6 +6,7 @@
 #define GOL3D_USER_H
 #pragma once
 
+#include <GL/glew.h>
 #include <glm/glm.hpp>
 
 #include "Camera.h"
@@ -74,6 +75,12 @@ private:
     const float cursorBound = 50.f;
     // Speed at which the cursor position changes.
     const float cursorSpeed = 0.2;
+
+    // OpenGL uniform for the cursor MVP matrix.
+    GLuint uMVP;
+
+    // Pointer to the cursor shader program.
+    GLuint *programCursor;
     
 public:
     // Spatial position.
@@ -108,9 +115,12 @@ public:
 
     void computeHeadingBasis();
 
+    void draw();
+
     void handleInput();
     
     void init(World *world_,
+              GLuint *programCursor_,
               glm::vec3 position_,
               float horizontalAngle_,
               float verticalAngle_);
@@ -120,10 +130,6 @@ public:
     void update(double t);
 
     void updateDraw();
-
-
-    
-
 };
 
 #endif //GOL3D_USER_H

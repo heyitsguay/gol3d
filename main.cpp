@@ -10,6 +10,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
+#include <GL/glxew.h>
+//#include <GL/glxext.h>
 
 //#define _DEBUG
 
@@ -78,6 +80,14 @@ int main() {
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
+    // Setup vsync.
+    Display *dpy = glXGetCurrentDisplay();
+    GLXDrawable drawable = glXGetCurrentDrawable();
+    if(drawable) {
+        glXSwapIntervalEXT(dpy, drawable, 1);
+    }
+
+
     // Set initial clear color
     glClearColor(0.f, 0.f, 0.f, 1.f);
 
@@ -134,15 +144,8 @@ int main() {
     GLuint SP_cursor = LoadShaders("../glsl/cursor.vert", "../glsl/cursor.frag");
     GLuint SP_skybox = LoadShaders("../glsl/skybox.vert", "../glsl/skybox.frag");
 
-    // Model matrix.
-    glm::mat4 Model = glm::mat4(1.f);
-
     // MVP matrix.
     glm::mat4 MVP;
-
-    // Uniform handles for SP_cursor.
-    // Handle for the MVP uniform.
-    GLuint uMVP_cursor = (GLuint) glGetUniformLocation(SP_cursor, "u_MVP");
 
     // Set the alpha blend function.
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -182,7 +185,7 @@ int main() {
     float horizontalAngle0 = (float)PI;
     float verticalAngle0 = 0.f;
     auto user = User();
-    user.init(&world, position0, horizontalAngle0, verticalAngle0);
+    user.init(&world, &SP_cursor, position0, horizontalAngle0, verticalAngle0);
 
     // Skybox setup. MUST come after Camera setup.
     const float skyscale = 10000.f;
@@ -202,9 +205,6 @@ int main() {
             lastTime += 1.0;
         }
 
-        // Simulated time.
-//        t = (float)std::fmod(t+dt, 1000.);
-
         // Check for a program exit.
         if(io.pressed(GLFW_KEY_ESCAPE)) {
             glfwSetWindowShouldClose(window, GL_TRUE);
@@ -222,36 +222,17 @@ int main() {
         // Can compute MVP and camera_pos uniforms.
         MVP = cam.VP;
 
-        float dcube = 2.f * world.scale;
-        glm::vec3 vscale(world.scale, world.scale, world.scale);
+//        float dcube = 2.f * world.scale;
+//        glm::vec3 vscale(world.scale, world.scale, world.scale);
 
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         world.draw((float)t);
 
-        // Draw the skybox.
         skybox.draw();
 
-        // If the World is in the 'edit' state, render the draw cursor.
-        if(world.state == edit) {
-
-            glEnable(GL_BLEND);
-            glDisable(GL_DEPTH_TEST);
-            glDisable(GL_CULL_FACE);
-            glUseProgram(SP_cursor);
-
-            auto translation = glm::vec3(user.drawCursor.x * dcube,
-                                         user.drawCursor.y * dcube,
-                                         user.drawCursor.z * dcube);
-
-            glm::mat4 translatedModel = glm::scale(glm::translate(Model, translation), vscale);
-            glm::mat4 MVP2 = cam.VP * translatedModel;
-
-            glUniformMatrix4fv(uMVP_cursor, 1, GL_FALSE, &MVP2[0][0]);
-
-            glDrawArrays(GL_TRIANGLES, 0, (GLsizei)g_vertices.size());
-        }
+        user.draw();
 
         glfwSwapBuffers(window);
 

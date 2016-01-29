@@ -113,8 +113,6 @@ void World::cubeCube(int hwidth, float p, glm::ivec3 center) {
  * @param camPosition: Position of the Camera.
  */
 void World::draw(float t) {
-    float scale2 = 2 * scale;
-
     // Tracks the number of Cubes to draw.
     int drawCount = 0;
 
@@ -312,6 +310,7 @@ void World::init(
     program = program_;
 
     scale = scale_;
+    scale2 = 2 * scale;
 
     frames_per_draw = frames_per_draw_;
 

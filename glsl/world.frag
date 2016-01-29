@@ -21,14 +21,14 @@ vec3 hsv2rgb(vec3 c){
 }
 
 void main() {
-    float scale = 8e-4 / f_scale;
+    float scale = 8e-3 / f_scale;
     vec3 scaled_position = f_position * vec3(scale, scale, scale);
 //    float other = dot(scaled_position, f_normal);
 //    vec3 dcenter = f_position - u_center;
 //    float ddcenter2 = dot(dcenter, dcenter);
 //    float h = fract(dot(scaled_position, vec3(1., 1., 1.)) * u_t + 0.95 * sin(0.5 * (scaled_position.x + abs(dot(scaled_position, vec3(1., 1., 1.)))) * u_t)) + 0.25 * sin(2 * dcenter.y + 0.5 * ddcenter2 * dcenter.x * u_t);
-//    float h = fract(0.7 + 0.12 * u_t + sqrt(dot(scaled_position, scaled_position)));
-    float h = 0.5 * (1. + tanh(scaled_position.y));
+    float h = fract(0.7 + 0.12 * u_t + sqrt(dot(scaled_position, scaled_position)));
+//    float h = 0.5 * (1. + tanh(scaled_position.y));
     float s = 0.7;
 
     // Compute brightness.

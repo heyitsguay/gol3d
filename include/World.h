@@ -99,6 +99,9 @@ public:
     // Spatial scale of the Cubes.
     float scale;
 
+    // 2 * the spatial scale of the Cubes.
+    float scale2;
+
     // Arrays containing drawn Cube translation and scaling info.
     std::vector<glm::vec3> translations;
     std::vector<float> scales;

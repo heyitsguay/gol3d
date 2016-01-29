@@ -33,6 +33,36 @@ void User::computeHeadingBasis() {
 }
 
 /**
+ * User.draw()
+ * Currently, just draws the edit cursor.
+ */
+void User::draw() {
+    // Only draw if the world is in edit mode.
+    if(world->state == edit) {
+        // Always going to start with the identity Model matrix.
+        const glm::mat4 Model(1.f);
+
+        // Scaling vector.
+        glm::vec3 vScale(world->scale);
+
+        glEnable(GL_BLEND);
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_CULL_FACE);
+        glUseProgram(*programCursor);
+
+        // Compute the cursor Cube translation.
+        auto translation = 2.f * glm::vec3(drawCursor) * vScale;
+
+        glm::mat4 translatedModel = glm::scale(glm::translate(Model, translation), vScale);
+        glm::mat4 MVP = cam.VP * translatedModel;
+
+        glUniformMatrix4fv(uMVP, 1, GL_FALSE, &MVP[0][0]);
+
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+    }
+}
+
+/**
  * User.handleInput()
  * Handles user input.
  */
@@ -175,10 +205,12 @@ void User::handleInput() {
  * @param verticalAngle_: User initial heading vertical angle.
  */
 void User::init(World *world_,
+                GLuint *programCursor_,
                 glm::vec3 position_,
                 float horizontalAngle_,
                 float verticalAngle_) {
     world = world_;
+    programCursor = programCursor_;
     position = position_;
     horizontalAngle = horizontalAngle_;
     verticalAngle = verticalAngle_;
@@ -200,6 +232,9 @@ void User::init(World *world_,
     drawLive = false;
     drawDead = false;
     cubeHwidth = 4;
+
+    // OpenGL setup.
+    uMVP = (GLuint)glGetUniformLocation(*programCursor, "u_MVP");
 }
 
 /**
