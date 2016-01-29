@@ -199,10 +199,20 @@ void Application::initGL(int monitorID, int quality, int aaSamples) {
     glClearColor(0.f, 0.f, 0.f, 1.f);
 
     // Read in the cube.obj file.
-    auto *path = (char*)"../obj/cube.obj";
-    if(!load_obj(path, cubeVertices, cubeNormals)) {
+    auto *path = (char*)"../../data/obj/cubeuv2.obj";
+    if(!load_textured_obj(path, cubeVertices, cubeNormals, cubeUVs)) {
         printf("Could not load %s\n", path);
         abort();
+    }
+
+    // Renormalize UV coordinates.
+    // Scaling factor
+    float fac = float(cubeTexSize) / (2 * float(texAtlasSize));
+    // Scaling vector.
+    glm::vec2 uvRescale(fac);
+    // Scale
+    for(auto &uv : cubeUVs) {
+        uv = uv * uvRescale + uvRescale;
     }
 
     // Set up the cube VAO.
@@ -239,10 +249,24 @@ void Application::initGL(int monitorID, int quality, int aaSamples) {
     );
     glEnableVertexAttribArray(1);
 
+    // Set up the cube UV coordinate VBO.
+    glGenBuffers(1, &uvVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, uvVBO);
+    glBufferData(GL_ARRAY_BUFFER, 36 * sizeof(glm::vec2), &cubeUVs[0], GL_STATIC_DRAW);
+    glVertexAttribPointer(
+            4,
+            2,
+            GL_FLOAT,
+            GL_FALSE,
+            0,
+            (void*)0
+    );
+    glEnableVertexAttribArray(4);
+
     // Load shaders.
-    worldSP = LoadShaders("../glsl/world.vert", "../glsl/world.frag");
-    cursorSP = LoadShaders("../glsl/cursor.vert", "../glsl/cursor.frag");
-    skyboxSP = LoadShaders("../glsl/skybox.vert", "../glsl/skybox.frag");
+    worldSP = LoadShaders("../../src/glsl/world.vert", "../../src/glsl/world.frag");
+    cursorSP = LoadShaders("../../src/glsl/cursor.vert", "../../src/glsl/cursor.frag");
+    skyboxSP = LoadShaders("../../src/glsl/skybox.vert", "../../src/glsl/skybox.frag");
 
     // Set the alpha blend function.
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

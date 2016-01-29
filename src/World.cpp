@@ -13,6 +13,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
+#include <SOIL/SOIL.h>
 
 #include "Cube.h"
 #include "World.h"
@@ -149,6 +150,7 @@ void World::draw(float t) {
         glUniformMatrix4fv(uMVP, 1, GL_FALSE, &(cam.VP)[0][0]);
         glUniform3fv(ucamera_pos, 1, &cam.position[0]);
         glUniform1f(ut, t);
+        glUniform1i(sAtlas, 1);
 
         glBindBuffer(GL_ARRAY_BUFFER, translationVBO);
         glBufferData(GL_ARRAY_BUFFER,
@@ -210,22 +212,21 @@ void World::flip(Cube *c) {
         for (int dy = -1; dy <= 1; ++dy) {
             int Y = c->y + dy;
             for (int dz = -1; dz <= 1; ++dz) {
-                // Don't update yourself.
 //                if (!(dx == 0 && dy == 0 && dz == 0)) {
                     int Z = c->z + dz;
 
                     // Add neighbor if its coordinate is in bounds.
-                    if( true
-//                            (X >= -bound/2 && X < bound/2) &&
-//                            (Y >= -bound/2 && Y < bound/2) &&
-//                            (Z >= -bound/2 && Z < bound/2)
-                            ) {
-                        long int k = key(X, Y, Z);
-                        auto coord = std::make_tuple(X, Y, Z);
-                        if (!findAddCubes(k)) {
-                            addCubes.insert({k, coord});
-                        }
+//                    if( true
+////                            (X >= -bound/2 && X < bound/2) &&
+////                            (Y >= -bound/2 && Y < bound/2) &&
+////                            (Z >= -bound/2 && Z < bound/2)
+//                            ) {
+                    long int k = key(X, Y, Z);
+                    auto coord = std::make_tuple(X, Y, Z);
+                    if (!findAddCubes(k)) {
+                        addCubes.insert({k, coord});
                     }
+//                    }
 //                }
             }
         }
@@ -338,7 +339,7 @@ void World::initGL() {
     // Get GLSL uniform pointers.
     uMVP = (GLuint) glGetUniformLocation(*program, "u_MVP");
     ucamera_pos = (GLuint) glGetUniformLocation(*program, "u_camera_pos");
-    ut = (GLuint) glGetUniformLocation(*program, "ut");
+    ut = (GLuint) glGetUniformLocation(*program, "u_t");
 
     // Create the translation VBO.
     glGenBuffers(1, &translationVBO);
@@ -367,6 +368,28 @@ void World::initGL() {
     );
     glVertexAttribDivisor(3, (GLuint)1);
     glEnableVertexAttribArray(3);
+
+    // Create texture, load image data.
+    glGenTextures(1, &atlasTex);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, atlasTex);
+    // Image width and height.
+    int width, height;
+    unsigned char *image = SOIL_load_image("../../data/img/cubeatlas.png",
+                                           &width,
+                                           &height,
+                                           0,
+                                           SOIL_LOAD_RGBA);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+    SOIL_free_image_data(image);
+    // Set texture params.
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    sAtlas = (GLuint)glGetUniformLocation(*program, "s_atlas");
 }
 
 /**

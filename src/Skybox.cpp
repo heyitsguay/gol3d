@@ -79,19 +79,19 @@ void Skybox::init(GLuint *program_, Camera *cam_, float scale_, bool useHD) {
 
     // Set up Skybox cube map.
     // Path to the low-def textures.
-    lowNames.push_back("../img/box1/front.jpg");
-    lowNames.push_back("../img/box1/back.jpg");
-    lowNames.push_back("../img/box1/up.jpg");
-    lowNames.push_back("../img/box1/down.jpg");
-    lowNames.push_back("../img/box1/right.jpg");
-    lowNames.push_back("../img/box1/left.jpg");
+    lowNames.push_back("../../data/img/box1/front.jpg");
+    lowNames.push_back("../../data/img/box1/back.jpg");
+    lowNames.push_back("../../data/img/box1/up.jpg");
+    lowNames.push_back("../../data/img/box1/down.jpg");
+    lowNames.push_back("../../data/img/box1/right.jpg");
+    lowNames.push_back("../../data/img/box1/left.jpg");
 
-    highNames.push_back("../img/box2/left.png");
-    highNames.push_back("../img/box2/right.png");
-    highNames.push_back("../img/box2/up.png");
-    highNames.push_back("../img/box2/down.png");
-    highNames.push_back("../img/box2/front.png");
-    highNames.push_back("../img/box2/back.png");
+    highNames.push_back("../../data/img/box2/left.png");
+    highNames.push_back("../../data/img/box2/right.png");
+    highNames.push_back("../../data/img/box2/up.png");
+    highNames.push_back("../../data/img/box2/down.png");
+    highNames.push_back("../../data/img/box2/front.png");
+    highNames.push_back("../../data/img/box2/back.png");
 
     if(useHD) {
         tex = loadCubemap(highNames);

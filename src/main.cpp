@@ -20,8 +20,8 @@ S3/B4: Similar to S9/B4 but with a paired linear puffer.
 */
 
 // GOL rules.
-int stay_arr[] = {2};
-int born_arr[] = {1, 4};
+int stay_arr[] = {3};
+int born_arr[] = {4};
 
 // Half-width of one side of the initial cube of Cubes.
 int hwidth = 5;
@@ -29,7 +29,8 @@ int hwidth = 5;
 int main() {
     // Create and initialize the Application.
     Application &app = Application::getInstance();
-    app.init(0, QUALITY_LAPTOP);
+//    app.init(0, QUALITY_LAPTOP);
+    app.init(1);
 
     // GOL3D setup.
     // Stay rule values.
@@ -55,4 +56,3 @@ int main() {
 
     return 0;
 }
-#pragma clang diagnostic pop

@@ -7,7 +7,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -g -std=c++11 -O3")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -std=c++11")
 
 set(SOURCE_FILES
-        main.cpp
+        src/main.cpp
         src/load_shader.cpp
         src/load_bmp.cpp
         src/load_obj.cpp

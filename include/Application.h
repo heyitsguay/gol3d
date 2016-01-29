@@ -33,11 +33,19 @@ private:
     // When true, the Application prints performance info.
     bool printPerfInfo = false;
 
+    // Side length of Cube textures, in pixels.
+    int cubeTexSize = 16;
+
+    // Size of the Cube texture atlas.
+    int texAtlasSize = 256;
+
     void freeGL();
 
     void handleInput();
 
     void initGL(int monitorID, int quality, int aaSamples);
+
+    void loadCubeTexture();
 
     void perfInfo();
 
@@ -71,6 +79,9 @@ public:
     // The main Cube normals.
     std::vector<glm::vec3> cubeNormals;
 
+    // Cube texel coordinates.
+    std::vector<glm::vec2> cubeUVs;
+
     // The display window.
     GLFWwindow *window;
 
@@ -82,6 +93,9 @@ public:
 
     // Cube normal VBO.
     GLuint normalVBO;
+
+    // Cube UV coordinate VBO.
+    GLuint uvVBO;
 
     // Shader programs (SP).
     GLuint worldSP, cursorSP, skyboxSP;

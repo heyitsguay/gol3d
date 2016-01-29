@@ -115,6 +115,12 @@ public:
     // Counts the actual number of Cubes drawn each frame.
     int drawCount = 0;
 
+    // ID of the Cube texture atlas.
+    GLuint atlasTex;
+
+    // ID of the Cube texture sampler uniform
+    GLuint sAtlas;
+
 
     World();
     ~World();
