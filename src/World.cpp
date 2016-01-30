@@ -18,6 +18,8 @@
 #include "Cube.h"
 #include "World.h"
 
+#include "opengl-debug.h"
+
 /**
  * World()
  * Initializes the World running a 3D version of Conway's Game of Life.
@@ -36,9 +38,11 @@ World::~World() {
 
     glDisableVertexAttribArray(2);
     glDisableVertexAttribArray(3);
+    glDisableVertexAttribArray(4);
 
     glDeleteBuffers(1, &translationVBO);
     glDeleteBuffers(1, &scaleVBO);
+    glDeleteBuffers(1, &typeVBO);
 };
 
 /**
@@ -59,7 +63,7 @@ void World::add(int x, int y, int z) {
             limbo.pop();
 
             // Set the Cube up.
-            c->setup(x, y, z, false);
+            c->setup(x, y, z);
 
             // Add the Cube to activeCubes.
             activeCubes.insert({k, c});
@@ -120,6 +124,7 @@ void World::draw(float t) {
     // Clear the translation and scale data arrays.
     translations.clear();
     scales.clear();
+    types.clear();
 
     // Update drawn Cube translation and scale info.
     for(auto it = drawCubes.begin(); it != drawCubes.end(); ++it) {
@@ -134,6 +139,7 @@ void World::draw(float t) {
             // Close enough to the Camera, should be drawn.
             translations.push_back(translation);
             scales.push_back(scale);
+            types.push_back(c->texBase);
 
             drawCount++;
         }
@@ -164,7 +170,13 @@ void World::draw(float t) {
                      &scales[0],
                      GL_DYNAMIC_DRAW);
 
-        glDrawArraysInstanced(GL_TRIANGLES, 0, 36, (GLsizei)drawCount);
+        glBindBuffer(GL_ARRAY_BUFFER, typeVBO);
+        glBufferData(GL_ARRAY_BUFFER,
+                     sizeof(glm::ivec2) * drawCount,
+                     &types[0][0],
+                     GL_DYNAMIC_DRAW);
+
+        GL_CHECK( glDrawArraysInstanced(GL_TRIANGLES, 0, 36, (GLsizei)drawCount) );
     }
 
 }
@@ -368,6 +380,19 @@ void World::initGL() {
     );
     glVertexAttribDivisor(3, (GLuint)1);
     glEnableVertexAttribArray(3);
+
+    // Create the type VBO.
+    glGenBuffers(1, &typeVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, typeVBO);
+    glVertexAttribIPointer(
+            4,
+            2,
+            GL_INT,
+            0,
+            (void*)0
+    );
+    glVertexAttribDivisor(4, (GLuint)1);
+    glEnableVertexAttribArray(4);
 
     // Create texture, load image data.
     glGenTextures(1, &atlasTex);

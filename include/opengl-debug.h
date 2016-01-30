@@ -6,7 +6,7 @@
 #define GOL3D_OPENGL_DEBUG_H
 #pragma once
 
-void CheckOpenGLError(const char* stmt, const char* fname, int line)
+static void CheckOpenGLError(const char* stmt, const char* fname, int line)
 {
     GLenum err = glGetError();
     if (err != GL_NO_ERROR)

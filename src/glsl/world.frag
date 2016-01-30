@@ -3,6 +3,7 @@
 in vec3 f_normal;
 in vec3 f_position;
 in float f_scale;
+flat in ivec2 f_typeCoords;
 in vec2 f_texCoords;
 
 layout(location = 0) out vec3 o_color;
@@ -11,7 +12,7 @@ uniform float u_t;
 uniform vec3 u_camera_pos;
 uniform sampler2D s_atlas;
 
-const float dTex = 0.0625;
+const vec2 dTex = vec2(0.0625, 0.0625);
 
 //const float h_base = 0.4;
 
@@ -32,10 +33,9 @@ void main() {
 //    float ddcenter2 = dot(dcenter, dcenter);
 //    float h = fract(dot(scaled_position, vec3(1., 1., 1.)) * u_t + 0.95 * sin(0.5 * (scaled_position.x + abs(dot(scaled_position, vec3(1., 1., 1.)))) * u_t)) + 0.25 * sin(2 * dcenter.y + 0.5 * ddcenter2 * dcenter.x * u_t);
     float h = fract(0.7 + 0.06 * u_t + sqrt(dot(scaled_position, scaled_position)));
-//    float h = 0.5 * (1. + tanh(scaled_position.y));
     float s = 0.7;
 
-    vec2 tc = vec2(dTex, 3 * dTex) + f_texCoords;
+    vec2 tc = vec2(f_typeCoords) * dTex + f_texCoords;
 
     // Compute brightness.
     vec3 dposition = u_camera_pos - f_position;

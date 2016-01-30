@@ -46,6 +46,7 @@ void Application::draw() {
 void Application::freeGL() {
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
+    glDisableVertexAttribArray(5);
     glDeleteBuffers(1, &vertexVBO);
     glDeleteBuffers(1, &normalVBO);
     glDeleteProgram(worldSP);
@@ -254,14 +255,14 @@ void Application::initGL(int monitorID, int quality, int aaSamples) {
     glBindBuffer(GL_ARRAY_BUFFER, uvVBO);
     glBufferData(GL_ARRAY_BUFFER, 36 * sizeof(glm::vec2), &cubeUVs[0], GL_STATIC_DRAW);
     glVertexAttribPointer(
-            4,
+            5,
             2,
             GL_FLOAT,
             GL_FALSE,
             0,
             (void*)0
     );
-    glEnableVertexAttribArray(4);
+    glEnableVertexAttribArray(5);
 
     // Load shaders.
     worldSP = LoadShaders("../../src/glsl/world.vert", "../../src/glsl/world.frag");

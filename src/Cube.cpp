@@ -8,13 +8,15 @@ Cube::Cube() {};
 
 Cube::~Cube() {};
 
-void Cube::setup(int x_, int y_, int z_, bool live_) {
+void Cube::setup(int x_, int y_, int z_, int type_) {
 // Sets up a Cube at a specific location, with a given state (default false).
     x = x_;
     y = y_;
     z = z_;
-    live = live_;
+    live = false;
     live_neighbors = 0;
-    mult = (float) live * 2.f;
+    mult = (float) live * 1.f;
+    type = type_;
+    texBase = typeBase[type];
 
 }

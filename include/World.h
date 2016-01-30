@@ -102,15 +102,16 @@ public:
     // 2 * the spatial scale of the Cubes.
     float scale2;
 
-    // Arrays containing drawn Cube translation and scaling info.
+    // Arrays containing drawn Cube translation, scaling, and type info.
     std::vector<glm::vec3> translations;
     std::vector<float> scales;
+    std::vector<glm::ivec2> types;
 
     // OpenGL uniform variables.
     GLuint uMVP, ucamera_pos, ut;
 
-    // OpenGL VBOs for translation and scaling info.
-    GLuint translationVBO, scaleVBO;
+    // OpenGL VBOs for translation, scaling, and type info.
+    GLuint translationVBO, scaleVBO, typeVBO;
 
     // Counts the actual number of Cubes drawn each frame.
     int drawCount = 0;
@@ -121,13 +122,12 @@ public:
     // ID of the Cube texture sampler uniform
     GLuint sAtlas;
 
-
     World();
     ~World();
 
     void add(int x, int y, int z);
 
-    void cubeCube(int hwidth = 10, float p = 0.1, glm::ivec3 center = glm::ivec3(0,0,0));
+    void cubeCube(int hwidth = 10, float p = 0.1, glm::ivec3 center=glm::ivec3(0,0,0));
 
     void draw(float t);
 
