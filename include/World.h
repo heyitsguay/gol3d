@@ -6,10 +6,7 @@
 #define GOL3D_WORLD_H
 #pragma once
 
-#include <queue>
-#include <tuple>
 #include <unordered_map>
-#include <unordered_set>
 #include <vector>
 
 #include <glm/glm.hpp>
@@ -71,8 +68,8 @@ public:
     // If born[j], then a dead cell with j live neighbors will become live.
     bool born[27] = {false};
 
-    // Queue containing all of the uninitialized Cubes in the World.
-    std::queue<Cube*> limbo;
+    // Vector containing all of the uninitialized Cubes in the World.
+    std::vector<Cube*> limbo;
 
     // Cube centers must stay in the box [-bound, bound]^3.
     int bound;
@@ -90,8 +87,8 @@ public:
     // Vector containing the indices of Cubes to remove from activeCubes.
     std::vector<glm::ivec3> removeCubes;
 
-    // Maximum number of Cubes.
-    int maxCubes;
+    // Initial number of Cubes created in limbo.
+    int initNumCubes;
 
     // Number of active Cubes.
     int nCubes;
@@ -145,7 +142,7 @@ public:
             GLuint *program_,
             float scale_=1.f,
             int frames_per_draw_=10,
-            int maxCubes_=4000000,
+            int initNumCubes_=1000000,
             int bound_=10000
     );
 

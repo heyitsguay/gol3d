@@ -20,8 +20,8 @@ S3/B4: Similar to S9/B4 but with a paired linear puffer.
 */
 
 // GOL rules.
-int stay_arr[] = {3};
-int born_arr[] = {4};
+int stay_arr[] = {};
+int born_arr[] = {1};
 
 // Half-width of one side of the initial cube of Cubes.
 int hwidth = 5;
@@ -40,9 +40,12 @@ int main() {
     app.world.setRule(stay, born);
     // Initialize to have some randomly-activated Cubes.
     app.world.cubeCube(hwidth, 0.1);
+    app.world.state = run;
 
     // Main loop.
-    while(!glfwWindowShouldClose(app.window)) {
+    int temp = 100;
+//    while(!glfwWindowShouldClose(app.window)) {
+    while(temp--) {
         app.update();
         app.draw();
     }

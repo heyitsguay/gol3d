@@ -53,15 +53,15 @@ World::~World() {
  */
 void World::add(int x, int y, int z) {
 
-    // Only add a Cube if limbo isn't empty.
+    auto k = glm::ivec3(x, y, z);
+
+    // If it's not empty, add a Cube from limbo.
     if(!limbo.empty()) {
-//        long int k = key(x, y, z);
-        auto k = glm::ivec3(x, y, z);
         // Add the Cube if it's not already in activeCubes.
         if(!findIn(activeCubes, k)) {
             // Remove a Cube from limbo.
-            Cube *c = limbo.front();
-            limbo.pop();
+            Cube *c = limbo.back();
+            limbo.pop_back();
 
             // Set the Cube up.
             c->setup(x, y, z);
@@ -73,7 +73,9 @@ void World::add(int x, int y, int z) {
             nCubes++;
         }
     } else {
-        printf("You ran out of spare Cubes!\n");
+        Cube *c = new Cube();
+        c->setup(x, y, z);
+        activeCubes.insert({k, c});
     }
 }
 
@@ -220,21 +222,12 @@ void World::flip(Cube *c) {
         for (int dy = -1; dy <= 1; ++dy) {
             int Y = c->y + dy;
             for (int dz = -1; dz <= 1; ++dz) {
-//                if (!(dx == 0 && dy == 0 && dz == 0)) {
-                    int Z = c->z + dz;
+                int Z = c->z + dz;
 
-                    // Add neighbor if its coordinate is in bounds.
-//                    if( true
-////                            (X >= -bound/2 && X < bound/2) &&
-////                            (Y >= -bound/2 && Y < bound/2) &&
-////                            (Z >= -bound/2 && Z < bound/2)
-//                            ) {
-                    auto center = glm::ivec3(X, Y, Z);
-                    if (!findIn(addCubes, center)) {
-                        addCubes.insert({center, true});
-                    }
-//                    }
-//                }
+                auto center = glm::ivec3(X, Y, Z);
+                if (!findIn(addCubes, center)) {
+                    addCubes.insert({center, true});
+                }
             }
         }
     }
@@ -245,12 +238,9 @@ void World::flip(Cube *c) {
  * Frees all memory associated with Cubes (deletes them).
  */
 void World::freeMemory() {
-// Delete Cubes in the limbo queue.
-    auto ls = (int)limbo.size();
-    for(int i = 0; i < ls; ++i) {
-        Cube *c = limbo.front();
-        delete c;
-        limbo.pop();
+    // Delete Cubes in limbo.
+    for(auto it = limbo.begin(); it != limbo.end(); ++it) {
+        delete (*it);
     }
 
     // Delete Cubes in activeCubes.
@@ -310,7 +300,7 @@ void World::init(
         GLuint *program_,
         float scale_,
         int frames_per_draw_,
-        int maxCubes_,
+        int initNumCubes_,
         int bound_
     ) {
 
@@ -323,7 +313,7 @@ void World::init(
 
     frames_per_draw = frames_per_draw_;
 
-    maxCubes = maxCubes_;
+    initNumCubes = initNumCubes_;
 
     bound = bound_;
 
@@ -340,8 +330,8 @@ void World::init(
  */
 void World::initGL() {
     // Set up the translation and scale data arrays.
-    translations.reserve((unsigned long)maxCubes / 64);
-    scales.reserve((unsigned long)maxCubes / 64);
+    translations.reserve((unsigned long)initNumCubes / 64);
+    scales.reserve((unsigned long)initNumCubes / 64);
 
     // Get GLSL uniform pointers.
     uMVP = (GLuint) glGetUniformLocation(*program, "u_MVP");
@@ -435,7 +425,7 @@ void World::remove(glm::ivec3 key) {
         // Push dead Cubes back to limbo.
         Cube *c = activeCubes[key];
         if(!c->live) {
-            limbo.push(c);
+            limbo.push_back(c);
         }
         activeCubes.erase(key);
 
@@ -450,6 +440,7 @@ void World::remove(glm::ivec3 key) {
 void World::reset() {
     // Clear all the containers.
     freeMemory();
+    limbo.clear();
     activeCubes.clear();
     drawCubes.clear();
     addCubes.clear();
@@ -459,8 +450,8 @@ void World::reset() {
     fcount = 0;
 
     // Construct all the Cubes.
-    for(int i = 0; i < maxCubes; ++i) {
-        limbo.push(new Cube());
+    for(int i = 0; i < initNumCubes; ++i) {
+        limbo.push_back(new Cube());
     }
 
     // Number of active Cubes.
