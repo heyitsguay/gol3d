@@ -23,7 +23,7 @@ void Camera::handleInput() {
  * Camera.init()
  * Initializes the Camera object.
  * @param window_: Pointer to the GLFW window.
- * @param world_: Pointer to the GOL World.
+ * @param world_: Pointer to the GOL TempName.
  * @param ratio: Window aspect ratio.
  */
 void Camera::init() {

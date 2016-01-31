@@ -199,12 +199,12 @@ void User::handleInput() {
 /**
  * User.init()
  * Initializes the User.
- * @param world_: Pointer to the World.
+ * @param world_: Pointer to the TempName.
  * @param position_: User initial position.
  * @param horizontalAngle_: User initial heading horizontal angle.
  * @param verticalAngle_: User initial heading vertical angle.
  */
-void User::init(World *world_,
+void User::init(TempName *world_,
                 GLuint *programCursor_,
                 glm::vec3 position_,
                 float horizontalAngle_,
@@ -280,7 +280,7 @@ void User::update(double t) {
     cam.heading = heading;
     cam.up = up;
 
-    // If the World is in the 'edit' state, update the drawing cursor.
+    // If the TempName is in the 'edit' state, update the drawing cursor.
     if(world->state == edit) {
         updateDraw();
     }

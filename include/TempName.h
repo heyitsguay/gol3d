@@ -14,15 +14,16 @@
 #include "Camera.h"
 #include "Cube.h"
 #include "IO.h"
+
 #include "ivecHash.h"
 
-// Possible World update states.
+// Possible TempName update states.
 enum State {stop, edit, run};
 
 typedef std::unordered_map<glm::ivec3, Cube*, KeyFuncs, KeyFuncs> cubeMap_t;
 typedef std::unordered_map<glm::ivec3, bool, KeyFuncs, KeyFuncs> boolMap_t;
 
-class World {
+class TempName {
 private:
     // Tracks the current frame relative to the the frames_per_draw-length
     // update cycle.
@@ -46,33 +47,30 @@ private:
     // Fourth part of the update cycle.
     void updateResetCount();
 
-    // Tracks the number of updates needed to advance the World one step.
+    // Tracks the number of updates needed to advance the TempName one step.
     int stepCounter = 0;
 
     // Pointer to the main Cube VAO.
     GLuint *cubeVAO;
 
-    // Pointer to the World shader program.
+    // Pointer to the TempName shader program.
     GLuint *program;
 
 public:
-    // World state.
+    // TempName state.
     State state;
 
-    // How many frames between successive World draw calls.
+    // How many frames between successive TempName draw calls.
     int frames_per_draw;
 
-    // World rules, stored as a pair of length-27 bool arrays.
+    // TempName rules, stored as a pair of length-27 bool arrays.
     // If stay[i], then a live cell with i live neighbors will stay.
     bool stay[27] = {false};
     // If born[j], then a dead cell with j live neighbors will become live.
     bool born[27] = {false};
 
-    // Vector containing all of the uninitialized Cubes in the World.
+    // Vector containing all of the uninitialized Cubes in the TempName.
     std::vector<Cube*> limbo;
-
-    // Cube centers must stay in the box [-bound, bound]^3.
-    int bound;
 
     // Hashmap containing the Cubes to be updated this frame.
     cubeMap_t activeCubes;
@@ -80,8 +78,8 @@ public:
     // Hashmap containing the Cubes to be drawn this frame.
     cubeMap_t drawCubes;
 
-    // Unordered set containing (x, y, z) centers of Cubes to add to
-    // activeCubes.
+    // Hashmap indicating which Cubes should be added to activeCubes next
+    // cycle.
     boolMap_t addCubes;
 
     // Vector containing the indices of Cubes to remove from activeCubes.
@@ -119,8 +117,8 @@ public:
     // ID of the Cube texture sampler uniform
     GLuint sAtlas;
 
-    World();
-    ~World();
+    TempName();
+    ~TempName();
 
     void add(int x, int y, int z);
 
@@ -142,8 +140,7 @@ public:
             GLuint *program_,
             float scale_=1.f,
             int frames_per_draw_=10,
-            int initNumCubes_=1000000,
-            int bound_=10000
+            int initNumCubes_=1000000
     );
 
     void initGL();

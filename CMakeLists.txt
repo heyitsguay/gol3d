@@ -12,13 +12,13 @@ set(SOURCE_FILES
         src/load_bmp.cpp
         src/load_obj.cpp
         src/Cube.cpp
-        src/World.cpp
+        src/TempName.cpp
         src/Camera.cpp
         src/IO.cpp
         src/Skybox.cpp
         src/User.cpp
         src/Application.cpp
-    )
+        src/Object.cpp)
 add_executable(gol3d ${SOURCE_FILES})
 
 find_package(GLEW REQUIRED)

@@ -14,7 +14,7 @@ const unsigned int maxCubes = 1000000;
 // Cube spatial scale.
 const float scale = 0.5f;
 
-// World frames per update cycle.
+// TempName frames per update cycle.
 const int framesPerCycle = 10;
 
 Application::Application() :
@@ -85,7 +85,7 @@ void Application::init(int monitorID, int quality, int aaSamples) {
     // I/O handler setup.
     io.init(window);
 
-    // World setup.
+    // TempName setup.
     world.init(&cubeVAO, &worldSP, scale, framesPerCycle, maxCubes);
 
     // Camera setup.

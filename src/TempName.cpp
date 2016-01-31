@@ -16,24 +16,24 @@
 #include <SOIL/SOIL.h>
 
 #include "Cube.h"
-#include "World.h"
+#include "TempName.h"
 
 #include "opengl-debug.h"
 
 /**
- * World()
- * Initializes the World running a 3D version of Conway's Game of Life.
+ * TempName()
+ * Initializes the TempName running a 3D version of Conway's Game of Life.
  * @constructor
  */
-World::World() :
+TempName::TempName() :
         io(IO::getInstance()),
         cam(Camera::getInstance()) {};
 
 /**
- * ~World()
+ * ~TempName()
  * @destructor
  */
-World::~World() {
+TempName::~TempName() {
     freeMemory();
 
     glDisableVertexAttribArray(2);
@@ -46,12 +46,12 @@ World::~World() {
 };
 
 /**
- * World.add()
+ * TempName.add()
  * Adds a Cube to activeCubes with index idx and state (state).
  * @param idx: Unique index to a 3D spatial location for a Cube.
  * @param state: Cube state.
  */
-void World::add(int x, int y, int z) {
+void TempName::add(int x, int y, int z) {
 
     auto k = glm::ivec3(x, y, z);
 
@@ -80,14 +80,14 @@ void World::add(int x, int y, int z) {
 }
 
 /**
- * World.cubeCube()
- * Creates a cube active Cubes to the World at each (x, y, z) location
+ * TempName.cubeCube()
+ * Creates a cube active Cubes to the TempName at each (x, y, z) location
  * in the cube center + [-hwidth, hwidth]^3 with probability p.
  * @param hwidth: Setup volume half-width.
  * @param p: Cube activation probability.
  * @param center: Center of the cube of Cubes.
  */
-void World::cubeCube(int hwidth, float p, glm::ivec3 center) {
+void TempName::cubeCube(int hwidth, float p, glm::ivec3 center) {
     // Use a RNG to randomly add active cells to a cube of dimensions
     // [-hwidth, hwdith]^3.
     // obtain a seed from the system clock:
@@ -115,12 +115,12 @@ void World::cubeCube(int hwidth, float p, glm::ivec3 center) {
 }
 
 /**
- * World.draw()
- * Draws the World.
+ * TempName.draw()
+ * Draws the TempName.
  * @param t: Simulation time.
  * @param camPosition: Position of the Camera.
  */
-void World::draw(float t) {
+void TempName::draw(float t) {
     // Tracks the number of Cubes to draw.
     drawCount = 0;
 
@@ -185,28 +185,27 @@ void World::draw(float t) {
 }
 
 /**
- * World.findIn()
+ * TempName.findIn()
  * Returns true if the Cube with index (idx) is contained in the hashmap (map).
  * @param map: The hashmap to search for idx in.
  * @param idx: The hashmap key to search for.
  */
-template<typename T> bool World::findIn(std::unordered_map<glm::ivec3, T, KeyFuncs, KeyFuncs> &map, glm::ivec3 idx) {
+template<typename T> bool TempName::findIn(std::unordered_map<glm::ivec3, T, KeyFuncs, KeyFuncs> &map, glm::ivec3 idx) {
     return (map.find(idx) != map.end());
 }
-template bool World::findIn<Cube*>(cubeMap_t &map, glm::ivec3 idx);
-template bool World::findIn<bool>(boolMap_t &map, glm::ivec3 idx);
+template bool TempName::findIn<Cube*>(cubeMap_t &map, glm::ivec3 idx);
+template bool TempName::findIn<bool>(boolMap_t &map, glm::ivec3 idx);
 
 /**
- * World.flip()
+ * TempName.flip()
  * Toggles the state of Cube *c, then adds its neighbors to activeCubes.
  * @param c: Pointer to the Cube whose state is being toggled.
  */
-void World::flip(Cube *c) {
+void TempName::flip(Cube *c) {
     // Flip the Cube state.
     c->live = !(c->live);
 
     // Update the Cube's position in drawCubes.
-//    long int idx = key(c->x, c->y, c->z);
     auto key = glm::ivec3(c->x, c->y, c->z);
     if(!c->live) {
         // Cube is now dead, remove from drawCubes.
@@ -234,10 +233,10 @@ void World::flip(Cube *c) {
 }
 
 /**
- * World.freeMemory()
+ * TempName.freeMemory()
  * Frees all memory associated with Cubes (deletes them).
  */
-void World::freeMemory() {
+void TempName::freeMemory() {
     // Delete Cubes in limbo.
     for(auto it = limbo.begin(); it != limbo.end(); ++it) {
         delete (*it);
@@ -250,11 +249,11 @@ void World::freeMemory() {
 }
 
 /**
- * World.handleInput()
+ * TempName.handleInput()
  * Handles events triggered by user input.
  */
-void World::handleInput() {
-    // World state changes use keys 1, 2, 3.
+void TempName::handleInput() {
+    // TempName state changes use keys 1, 2, 3.
     if(io.toggled(GLFW_KEY_1)) {
         state = stop;
 
@@ -271,7 +270,7 @@ void World::handleInput() {
     } else if(io.toggled(GLFW_KEY_E)) {
         // Only increment if we're not in the middle of another step, or running.
         if(stepCounter == 0 && state != run) {
-            // Advance the World one step.
+            // Advance the TempName one step.
             stepCounter = frames_per_draw;
         }
     }
@@ -285,23 +284,22 @@ void World::handleInput() {
 }
 
 /**
- * World.init()
- * Initializes the World.
+ * TempName.init()
+ * Initializes the TempName.
  * @param cubeVAO_: Pointer to the main cube VAO.
- * @param program_: Pointer to the ID of the World's shader program.
+ * @param program_: Pointer to the ID of the TempName's shader program.
  * @param MVP_: Pointer to the Model-View-Projection matrix.
- * @param scale_: Spatial scale of the World's Cubes.
- * @param frames_per_draw_: Number of frames that the World's update cycle takes.
+ * @param scale_: Spatial scale of the TempName's Cubes.
+ * @param frames_per_draw_: Number of frames that the TempName's update cycle takes.
  * @param maxCubes_: Maximum number of simultaneously active Cubes.
  * @param bound_: Cubes are constrained to lie in the box [-bound_, bound_]^3.
  */
-void World::init(
+void TempName::init(
         GLuint *cubeVAO_,
         GLuint *program_,
         float scale_,
         int frames_per_draw_,
-        int initNumCubes_,
-        int bound_
+        int initNumCubes_
     ) {
 
     cubeVAO = cubeVAO_;
@@ -315,8 +313,6 @@ void World::init(
 
     initNumCubes = initNumCubes_;
 
-    bound = bound_;
-
     state = stop;
 
     initGL();
@@ -325,10 +321,10 @@ void World::init(
 }
 
 /**
- * World.initGL()
- * Initializes the OpenGL elements associated with the World.
+ * TempName.initGL()
+ * Initializes the OpenGL elements associated with the TempName.
  */
-void World::initGL() {
+void TempName::initGL() {
     // Set up the translation and scale data arrays.
     translations.reserve((unsigned long)initNumCubes / 64);
     scales.reserve((unsigned long)initNumCubes / 64);
@@ -403,24 +399,12 @@ void World::initGL() {
 }
 
 /**
- * World.key()
- * Computes a hash key from a coord_t element.
- * @param c: (x, y, z) coordinate.
- */
-//long int World::key(int x, int y, int z) {
-//    int b2 = bound / 2;
-//    return (long int)(x + b2) * (long int) bound * (long int)bound
-//           + (long int)(y + b2) * (long int)bound
-//            + (long int)(z + b2);
-//}
-
-/**
- * World.remove()
+ * TempName.remove()
  * Removes a Cube with center (key) from activeCubes and pushes it back
  * to limbo if it's dead.
  * @param key: Center coordinates of the Cube.
  */
-void World::remove(glm::ivec3 key) {
+void TempName::remove(glm::ivec3 key) {
     if(findIn(activeCubes, key)) {
         // Push dead Cubes back to limbo.
         Cube *c = activeCubes[key];
@@ -434,10 +418,10 @@ void World::remove(glm::ivec3 key) {
 }
 
 /**
- * World.reset()
- * Resets the World.
+ * TempName.reset()
+ * Resets the TempName.
  */
-void World::reset() {
+void TempName::reset() {
     // Clear all the containers.
     freeMemory();
     limbo.clear();
@@ -459,12 +443,12 @@ void World::reset() {
 }
 
 /**
- * World.setRule()
+ * TempName.setRule()
  * Sets the update rule for the Cube states.
  * @param stay_vals: A live Cube stays live if its live neighbor count is an element of this vector.
  * @param born_vals: A dead Cube becomes live if its live neighbor count is an element of this vector.
  */
-void World::setRule(std::vector<int> stay_vals, std::vector<int> born_vals) {
+void TempName::setRule(std::vector<int> stay_vals, std::vector<int> born_vals) {
     // Reset the rule arrays.
     for(int i = 0; i < 27; ++i) {
         stay[i] = false;
@@ -485,11 +469,11 @@ void World::setRule(std::vector<int> stay_vals, std::vector<int> born_vals) {
 }
 
 /**
- * World.update()
+ * TempName.update()
  * Updates the Cubes in activeCubes.
  * @param t: Current frame's count within [0, frames_per_draw).
  */
-void World::update() {
+void TempName::update() {
 
     // Handle user input.
     handleInput();
@@ -520,10 +504,10 @@ void World::update() {
 }
 
 /**
- * World.updateActiveCubes()
+ * TempName.updateActiveCubes()
  * Processes removeCubes and addCubes to update activeCubes.
  */
-void World::updateActiveCubes() {
+void TempName::updateActiveCubes() {
     // First, remove inactive Cubes from activeCubes.
     for (auto &center : removeCubes) {
         remove(center);
@@ -541,10 +525,10 @@ void World::updateActiveCubes() {
 }
 
 /**
- * World.updateNeighborCount()
+ * TempName.updateNeighborCount()
  * Counts the number of live Cubes neighboring each Cube in activeCubes.
  */
-void World::updateNeighborCount() {
+void TempName::updateNeighborCount() {
     // First pass: compute number of living neighbors for each Cube that
     // needs to be updated.
     for (auto it = activeCubes.begin(); it != activeCubes.end(); ++it) {
@@ -565,9 +549,6 @@ void World::updateNeighborCount() {
                             // Check if the neighbor exists in activeCubes. Increment
                             // its live_neighbors if it does.
                             auto key = glm::ivec3(X, Y, Z);
-//                            if (findIn(activeCubes, k)) {
-//                                activeCubes[k]->live_neighbors++;
-//                            }
                             if(findIn(activeCubes, key)) {
                                 activeCubes[key]->live_neighbors++;
                             }
@@ -581,10 +562,10 @@ void World::updateNeighborCount() {
 }
 
 /**
- * World.updateResetCount()
+ * TempName.updateResetCount()
  * Resets the live_neighbors property to 0 for all Cubes in activeCubes.
  */
-void World::updateResetCount() {
+void TempName::updateResetCount() {
     for(auto it = activeCubes.begin(); it != activeCubes.end(); ++it) {
         Cube *c = it->second;
 
@@ -593,10 +574,10 @@ void World::updateResetCount() {
 }
 
 /**
- * World.updateState()
+ * TempName.updateState()
  * Updates the state of each Cube in activeCubes.
  */
-void World::updateState() {
+void TempName::updateState() {
     for (auto it = activeCubes.begin(); it != activeCubes.end(); ++it) {
         Cube *c = it->second;
 
@@ -607,7 +588,7 @@ void World::updateState() {
                 flip(c);
             }
 
-            // Check if a dead Cube should become live.
+        // Check if a dead Cube should become live.
         } else {
             // Cube becomes live.
             if (born[c->live_neighbors]) {
@@ -619,4 +600,4 @@ void World::updateState() {
         }
     }
 }
-// End World.cpp
+// End TempName.cpp

@@ -1,28 +1,30 @@
-Next: Decide what to do next!
+Next: Rewrite the TempName!!
 
+- 013016: Add a new World class to handle all the Objects.
+- 013016: Make the TempName's update cycle dynamic, to cope with different numbers of Cubes.
 - 013016: Add a Brian's brain CA mode.
 - 012916: Get the low and medium quality displays working.
-- 012816: Change the Cube coord tuples into glm::ivec3's.
-- 012716: Use a custom hash function to allow the World hashmaps to use 3D coordinates as a key.
-- 012716: Change World's 'limbo' object to be a vector instead of a queue.
 - 012616: Add a menu system for interaction.
-- 012616: Rewrite the World class as a subclass of an abstract 'Object' class.
+- 012616: Rewrite the TempName class as a subclass of an abstract 'Object' class.
 - 012616: Add Cube <-> User collision detection and User gravity.
 
 
-x 013016: Figure out templates to fix World's find*() functions. (DONE 013016)
+x 012716: Use a custom hash function to allow the TempName hashmaps to use 3D coordinates as a key. (DONE 013016)
+x 012716: Change TempName's 'limbo' object to be a vector instead of a queue. (DONE 013016)
+x 012816: Change the Cube coord tuples into glm::ivec3's. (DONE 013016)
+x 013016: Figure out templates to fix TempName's find*() functions. (DONE 013016)
 x 012916: Give the Cubes a 'type' property, write type aliases, add 'type' VBO. (DONE 013016)
 x 012816: Give the Cubes textures to render. (DONE 012916)
 x 012716: Add a Application singleton class to handle the OpenGL management. (DONE 012816)
 x 012716: Make Camera a singleton class to fix all this reference nonsense it creates. (DONE 012816)
 x 012616: Add a User class that takes some functionality from the Camera. (DONE 012816)
-x 012716: Create a World.draw(), pull draw stuff out of main.cpp. (DONE 012816)
-x 012716: Split World.init() into init(), initGL(), and setRule(). (DONE 012816)
+x 012716: Create a TempName.draw(), pull draw stuff out of main.cpp. (DONE 012816)
+x 012716: Split TempName.init() into init(), initGL(), and setRule(). (DONE 012816)
 x 012716: Create GitHub repository. (DONE 012716)
 x 012716: Let the Skybox toggle between drawing the skybox, all white, and all black. (DONE 012716)
-x 012716: Add a World step functionality to advance the World state one step. (DONE 012716)
+x 012716: Add a TempName step functionality to advance the TempName state one step. (DONE 012716)
 x 012616: Separate project files into src and include. (DONE 012716)
 x 012616: Create a skybox. (DONE 012716)
-x 012616: Have the World contain two hashmaps - one for active Cubes, one for drawn Cubes. (DONE 012616)
+x 012616: Have the TempName contain two hashmaps - one for active Cubes, one for drawn Cubes. (DONE 012616)
 x 012616: Write proper GLFW IO callbacks. (DONE 012616)
-x 012616: Split World.init() into init() and reset(). (DONE 012616)
+x 012616: Split TempName.init() into init() and reset(). (DONE 012616)
