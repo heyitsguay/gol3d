@@ -85,9 +85,9 @@ void User::handleInput() {
         horizontalAngle -= rotation_speed;
     }
     // Clamp the vertical angle.
-    clamp(verticalAngle, -PI/2, PI/2);
+    myclamp(verticalAngle, -PI/2, PI/2);
     // Keep the horizontal angle in [0, 2*PI)
-    horizontalAngle = float(mod(horizontalAngle, 2*PI));
+    horizontalAngle = float(pmod(horizontalAngle, 2*PI));
 
     // Handle speed update.
     if(
@@ -165,9 +165,9 @@ void User::handleInput() {
         cursorOffset = glm::vec3(0, 0, 0);
     }
     // Clamp the offset.
-    clamp(cursorOffset.x, -cursorBound, cursorBound);
-    clamp(cursorOffset.y, -5.f, cursorBound);
-    clamp(cursorOffset.z, -cursorBound, cursorBound);
+    myclamp(cursorOffset.x, -cursorBound, cursorBound);
+    myclamp(cursorOffset.y, -5.f, cursorBound);
+    myclamp(cursorOffset.z, -cursorBound, cursorBound);
     // Start drawing.
     if(io.toggled(GLFW_KEY_SPACE)) {
         if(world->state == edit) {
@@ -309,10 +309,10 @@ void User::updateDraw() {
     drawCursor.z = static_cast<int>(std::round(cursor.z * iscale));
 
     // activeCubes index of the cursor location.
-    long int idx = world->key(drawCursor.x, drawCursor.y, drawCursor.z);
+    auto key = glm::ivec3(drawCursor.x, drawCursor.y, drawCursor.z);
 
     // Indicates whether the Cube at the cursor location is in activeCubes
-    bool inMap = world->findActiveCubes(idx);
+    bool inMap = world->findIn(world->activeCubes, key);
 
     // Initialize drawing.
     if(drawStart) {
@@ -320,7 +320,7 @@ void User::updateDraw() {
 
         if(inMap) {
             // The Cube under the cursor is already in activeCubes.
-            Cube *c = world->activeCubes[idx];
+            Cube *c = world->activeCubes[key];
 
             if(c->live) {
                 // The Cube is live. Draw dead Cubes.
@@ -340,7 +340,7 @@ void User::updateDraw() {
     if(drawLive) {
         if(inMap) {
             // Access the Cube.
-            Cube *c = world->activeCubes[idx];
+            Cube *c = world->activeCubes[key];
 
             if(!c->live) {
                 // Only do something if the Cube is dead.
@@ -350,7 +350,7 @@ void User::updateDraw() {
             // No Cube in the activeCubes at the cursor. Create it, then flip its
             // state.
             world->add(drawCursor.x, drawCursor.y, drawCursor.z);
-            world->flip(world->activeCubes[idx]);
+            world->flip(world->activeCubes[key]);
         }
     }
 
@@ -358,7 +358,7 @@ void User::updateDraw() {
     if(drawDead) {
         if(inMap) {
             // Access the Cube.
-            Cube *c = world->activeCubes[idx];
+            Cube *c = world->activeCubes[key];
 
             if(c->live) {
                 // Only do something if the Cube is alive.

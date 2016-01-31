@@ -17,11 +17,13 @@
 #include "Camera.h"
 #include "Cube.h"
 #include "IO.h"
+#include "ivecHash.h"
 
 // Possible World update states.
 enum State {stop, edit, run};
 
-//typedef std::unordered_map<coord_t, Cube*> hashmap3d_t;
+typedef std::unordered_map<glm::ivec3, Cube*, KeyFuncs, KeyFuncs> cubeMap_t;
+typedef std::unordered_map<glm::ivec3, bool, KeyFuncs, KeyFuncs> boolMap_t;
 
 class World {
 private:
@@ -56,8 +58,6 @@ private:
     // Pointer to the World shader program.
     GLuint *program;
 
-
-
 public:
     // World state.
     State state;
@@ -78,17 +78,17 @@ public:
     int bound;
 
     // Hashmap containing the Cubes to be updated this frame.
-    std::unordered_map<long int, Cube*> activeCubes;
+    cubeMap_t activeCubes;
 
     // Hashmap containing the Cubes to be drawn this frame.
-    std::unordered_map<long int, Cube*> drawCubes;
+    cubeMap_t drawCubes;
 
     // Unordered set containing (x, y, z) centers of Cubes to add to
     // activeCubes.
-    std::unordered_map<long int, std::tuple<int, int, int>> addCubes;
+    boolMap_t addCubes;
 
     // Vector containing the indices of Cubes to remove from activeCubes.
-    std::vector<long int> removeCubes;
+    std::vector<glm::ivec3> removeCubes;
 
     // Maximum number of Cubes.
     int maxCubes;
@@ -131,9 +131,8 @@ public:
 
     void draw(float t);
 
-    bool findActiveCubes(long int idx);
-
-    bool findAddCubes(long int idx);
+    template<typename T>
+    bool findIn(std::unordered_map<glm::ivec3, T, KeyFuncs, KeyFuncs> &map, glm::ivec3 key);
 
     void flip(Cube *c);
 
@@ -152,9 +151,7 @@ public:
 
     void initGL();
 
-    long int key(int x, int y, int z);
-
-    void remove(long int idx);
+    void remove(glm::ivec3 key);
 
     void reset();
 

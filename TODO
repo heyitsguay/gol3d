@@ -1,6 +1,6 @@
 Next: Decide what to do next!
 
-- 012916: Give the Cubes a 'type' property, write type aliases, add 'type' VBO.
+- 013016: Add a Brian's brain CA mode.
 - 012916: Get the low and medium quality displays working.
 - 012816: Change the Cube coord tuples into glm::ivec3's.
 - 012716: Use a custom hash function to allow the World hashmaps to use 3D coordinates as a key.
@@ -9,6 +9,9 @@ Next: Decide what to do next!
 - 012616: Rewrite the World class as a subclass of an abstract 'Object' class.
 - 012616: Add Cube <-> User collision detection and User gravity.
 
+
+x 013016: Figure out templates to fix World's find*() functions. (DONE 013016)
+x 012916: Give the Cubes a 'type' property, write type aliases, add 'type' VBO. (DONE 013016)
 x 012816: Give the Cubes textures to render. (DONE 012916)
 x 012716: Add a Application singleton class to handle the OpenGL management. (DONE 012816)
 x 012716: Make Camera a singleton class to fix all this reference nonsense it creates. (DONE 012816)

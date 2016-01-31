@@ -10,7 +10,7 @@
 
 const double PI = 3.1415926535897;
 
-#define mod(m, n) fmod(fmod(m, n) + n, n)
-#define clamp(n, lower, upper) if(n < lower) n = lower; else if(n > upper) n = upper
+#define pmod(m, n) fmod(fmod(m, n) + n, n)
+#define myclamp(n, lower, upper) if(n < lower) n = lower; else if(n > upper) n = upper
 
 #endif //GOL3D_GLOBAL_H

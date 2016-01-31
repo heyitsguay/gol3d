@@ -15,7 +15,6 @@ void Cube::setup(int x_, int y_, int z_, int type_) {
     z = z_;
     live = false;
     live_neighbors = 0;
-    mult = (float) live * 1.f;
     type = type_;
     texBase = typeBase[type];
 

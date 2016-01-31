@@ -55,9 +55,10 @@ void World::add(int x, int y, int z) {
 
     // Only add a Cube if limbo isn't empty.
     if(!limbo.empty()) {
-        long int k = key(x, y, z);
+//        long int k = key(x, y, z);
+        auto k = glm::ivec3(x, y, z);
         // Add the Cube if it's not already in activeCubes.
-        if(!findActiveCubes(k)) {
+        if(!findIn(activeCubes, k)) {
             // Remove a Cube from limbo.
             Cube *c = limbo.front();
             limbo.pop();
@@ -104,7 +105,7 @@ void World::cubeCube(int hwidth, float p, glm::ivec3 center) {
                 // Add an active Cube at (x,y,z) with probability p.
                 if(v < p) {
                     add(x, y, z);
-                    flip(activeCubes[key(x, y, z)]);
+                    flip(activeCubes[glm::ivec3(x, y, z)]);
                 }
             }
         }
@@ -182,22 +183,16 @@ void World::draw(float t) {
 }
 
 /**
- * World.findActiveCubes()
- * Returns true if the Cube with index (idx) is contained in activeCubes.
- * @param idx: Index of the Cube to look up.
+ * World.findIn()
+ * Returns true if the Cube with index (idx) is contained in the hashmap (map).
+ * @param map: The hashmap to search for idx in.
+ * @param idx: The hashmap key to search for.
  */
-bool World::findActiveCubes(long int idx) {
-    return (activeCubes.find(idx) != activeCubes.end());
+template<typename T> bool World::findIn(std::unordered_map<glm::ivec3, T, KeyFuncs, KeyFuncs> &map, glm::ivec3 idx) {
+    return (map.find(idx) != map.end());
 }
-
-/**
- * World.findAddCubes()
- * Returns true if the Cube with index (idx) is contained in addCubes.
- * @param idx: Index of the Cube to look up.
- */
-bool World::findAddCubes(long int idx) {
-    return (addCubes.find(idx) != addCubes.end());
-}
+template bool World::findIn<Cube*>(cubeMap_t &map, glm::ivec3 idx);
+template bool World::findIn<bool>(boolMap_t &map, glm::ivec3 idx);
 
 /**
  * World.flip()
@@ -209,13 +204,14 @@ void World::flip(Cube *c) {
     c->live = !(c->live);
 
     // Update the Cube's position in drawCubes.
-    long int idx = key(c->x, c->y, c->z);
+//    long int idx = key(c->x, c->y, c->z);
+    auto key = glm::ivec3(c->x, c->y, c->z);
     if(!c->live) {
         // Cube is now dead, remove from drawCubes.
-        drawCubes.erase(idx);
+        drawCubes.erase(key);
     } else {
         // Cube is now live, add to drawCubes.
-        drawCubes.insert({idx, c});
+        drawCubes.insert({key, c});
     }
 
     // Add neighbors to addCubes if they're not they're already.
@@ -233,10 +229,9 @@ void World::flip(Cube *c) {
 ////                            (Y >= -bound/2 && Y < bound/2) &&
 ////                            (Z >= -bound/2 && Z < bound/2)
 //                            ) {
-                    long int k = key(X, Y, Z);
-                    auto coord = std::make_tuple(X, Y, Z);
-                    if (!findAddCubes(k)) {
-                        addCubes.insert({k, coord});
+                    auto center = glm::ivec3(X, Y, Z);
+                    if (!findIn(addCubes, center)) {
+                        addCubes.insert({center, true});
                     }
 //                    }
 //                }
@@ -422,29 +417,27 @@ void World::initGL() {
  * Computes a hash key from a coord_t element.
  * @param c: (x, y, z) coordinate.
  */
-long int World::key(int x, int y, int z) {
-    int b2 = bound / 2;
-    return (long int)(x + b2) * (long int) bound * (long int)bound
-           + (long int)(y + b2) * (long int)bound
-            + (long int)(z + b2);
-}
+//long int World::key(int x, int y, int z) {
+//    int b2 = bound / 2;
+//    return (long int)(x + b2) * (long int) bound * (long int)bound
+//           + (long int)(y + b2) * (long int)bound
+//            + (long int)(z + b2);
+//}
 
 /**
  * World.remove()
- * Removes a Cube with center (x, y, z) from activeCubes and pushes it back
+ * Removes a Cube with center (key) from activeCubes and pushes it back
  * to limbo if it's dead.
- * @param x: Center x coordinate.
- * @param y: Center y coordinate.
- * @param z: Center z coordinate.
+ * @param key: Center coordinates of the Cube.
  */
-void World::remove(long int idx) {
-    if(findActiveCubes(idx)) {
+void World::remove(glm::ivec3 key) {
+    if(findIn(activeCubes, key)) {
         // Push dead Cubes back to limbo.
-        Cube *c = activeCubes[idx];
+        Cube *c = activeCubes[key];
         if(!c->live) {
             limbo.push(c);
         }
-        activeCubes.erase(idx);
+        activeCubes.erase(key);
 
         nCubes--;
     }
@@ -547,11 +540,8 @@ void World::updateActiveCubes() {
 
     // Second, add newly-active Cubes to activeCubes.
     for (auto it = addCubes.begin(); it != addCubes.end(); ++it) {
-        std::tuple<int, int, int> center = it->second;
-        int x = std::get<0>(center);
-        int y = std::get<1>(center);
-        int z = std::get<2>(center);
-        add(x, y, z);
+        glm::ivec3 center = it->first;
+        add(center.x, center.y, center.z);
     }
 
     // Clear addCubes and removeCubes.
@@ -583,9 +573,12 @@ void World::updateNeighborCount() {
 
                             // Check if the neighbor exists in activeCubes. Increment
                             // its live_neighbors if it does.
-                            long int k = key(X, Y, Z);
-                            if (findActiveCubes(k)) {
-                                activeCubes[k]->live_neighbors++;
+                            auto key = glm::ivec3(X, Y, Z);
+//                            if (findIn(activeCubes, k)) {
+//                                activeCubes[k]->live_neighbors++;
+//                            }
+                            if(findIn(activeCubes, key)) {
+                                activeCubes[key]->live_neighbors++;
                             }
                         }
 
@@ -630,13 +623,9 @@ void World::updateState() {
                 flip(c);
             } else {
                 // Dead cell stays dead.
-                removeCubes.push_back(key(c->x, c->y, c->z));
+                removeCubes.push_back(glm::ivec3(c->x, c->y, c->z));
             }
         }
-
-        // Reset live_neighbors.
-//        c->live_neighbors = 0;
     }
 }
-
 // End World.cpp

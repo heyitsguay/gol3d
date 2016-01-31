@@ -7,10 +7,10 @@
       <sourceFolder url="file://$MODULE_DIR$/src/load_bmp.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Cube.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/Skybox.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/World.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/load_shader.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/IO.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/World.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/Skybox.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/load_shader.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/User.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/Application.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />

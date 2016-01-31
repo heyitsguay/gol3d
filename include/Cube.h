@@ -14,13 +14,11 @@
 
 class Cube {
 public:
-    // Index of Cube
-//    long int idx;
 
     // Cube center coordinates.
     int x, y, z;
 
-    // Cube state: false = dead, true = alive.
+    // Cube state: false = dead, true = live.
     bool live;
     
     // Number of live neighbors.
@@ -31,9 +29,6 @@ public:
 
     // Texture coordinate base.
     glm::ivec2 texBase;
-
-    // Time-since-alive multiplier. 1 when state == alive.
-    float mult;
 
     Cube();
 
