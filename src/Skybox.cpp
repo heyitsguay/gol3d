@@ -86,12 +86,12 @@ void Skybox::init(GLuint *program_, Camera *cam_, float scale_, bool useHD) {
     lowNames.push_back("../../data/img/box1/right.jpg");
     lowNames.push_back("../../data/img/box1/left.jpg");
 
-    highNames.push_back("../../data/img/box2/left.png");
-    highNames.push_back("../../data/img/box2/right.png");
-    highNames.push_back("../../data/img/box2/up.png");
-    highNames.push_back("../../data/img/box2/down.png");
-    highNames.push_back("../../data/img/box2/front.png");
-    highNames.push_back("../../data/img/box2/back.png");
+    highNames.push_back("../../data/img/box3/left.png");
+    highNames.push_back("../../data/img/box3/right.png");
+    highNames.push_back("../../data/img/box3/up.png");
+    highNames.push_back("../../data/img/box3/down.png");
+    highNames.push_back("../../data/img/box3/front.png");
+    highNames.push_back("../../data/img/box3/back.png");
 
     if(useHD) {
         tex = loadCubemap(highNames);

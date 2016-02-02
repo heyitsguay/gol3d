@@ -8,15 +8,6 @@
 #include "load_obj.h"
 #include "opengl-debug.h"
 
-// Maximum number of Cubes that can be processed per frame.
-const unsigned int maxCubes = 1000000;
-
-// Cube spatial scale.
-const float scale = 0.5f;
-
-// TempName frames per update cycle.
-const int framesPerCycle = 10;
-
 Application::Application() :
         io(IO::getInstance()),
         cam(Camera::getInstance()) {}
@@ -85,8 +76,8 @@ void Application::init(int monitorID, int quality, int aaSamples) {
     // I/O handler setup.
     io.init(window);
 
-    // TempName setup.
-    world.init(&cubeVAO, &worldSP, scale, framesPerCycle, maxCubes);
+    // World setup.
+    world.init(&cubeVAO, &worldSP);
 
     // Camera setup.
     cam.init();
@@ -295,7 +286,7 @@ void Application::perfInfo() {
     }
 
     if(printPerfInfo) {
-        int numActiveCubes = (int)world.activeCubes.size();
+        int numActiveCubes = (int)world.activeObject->activeCubes.size();
         printf("%g ms/frame.\n %i active Cubes, %i Cubes drawn this frame.\n",
             frameRate, numActiveCubes, world.drawCount);
 

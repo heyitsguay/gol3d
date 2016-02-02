@@ -23,13 +23,13 @@ void User::computeHeadingBasis() {
             std::cos(verticalAngle) * std::cos(horizontalAngle)
     );
     // Right vector.
-    right = glm::vec3(
+    right = -glm::vec3(
             std::sin(horizontalAngle - PI / 2),
             0,
             std::cos(horizontalAngle - PI / 2)
     );
     // Up vector.
-    up = glm::cross(right, heading);
+    up = -glm::cross(right, heading);
 }
 
 /**
@@ -38,12 +38,12 @@ void User::computeHeadingBasis() {
  */
 void User::draw() {
     // Only draw if the world is in edit mode.
-    if(world->state == edit) {
+    if((*activeObj)->state == edit) {
         // Always going to start with the identity Model matrix.
         const glm::mat4 Model(1.f);
 
         // Scaling vector.
-        glm::vec3 vScale(world->scale);
+        glm::vec3 vScale((*activeObj)->scale);
 
         glEnable(GL_BLEND);
         glDisable(GL_DEPTH_TEST);
@@ -170,7 +170,7 @@ void User::handleInput() {
     myclamp(cursorOffset.z, -cursorBound, cursorBound);
     // Start drawing.
     if(io.toggled(GLFW_KEY_SPACE)) {
-        if(world->state == edit) {
+        if((*activeObj)->state == edit) {
             drawStart = true;
         }
     }
@@ -204,7 +204,7 @@ void User::handleInput() {
  * @param horizontalAngle_: User initial heading horizontal angle.
  * @param verticalAngle_: User initial heading vertical angle.
  */
-void User::init(TempName *world_,
+void User::init(World *world_,
                 GLuint *programCursor_,
                 glm::vec3 position_,
                 float horizontalAngle_,
@@ -218,6 +218,8 @@ void User::init(TempName *world_,
     position0 = position;
     horizontalAngle0 = horizontalAngle;
     verticalAngle0 = verticalAngle;
+
+    activeObj = &(world->activeObject);
 
     tPrev = 0.;
     speed = 0.f;
@@ -244,8 +246,8 @@ void User::init(TempName *world_,
  */
 void User::makeCubes() {
     // Only do it in edit mode.
-    if(world->state == edit) {
-        world->cubeCube(cubeHwidth, 0.1, drawCursor);
+    if((*activeObj)->state == edit) {
+        dynamic_cast<CellularAutomaton*>(*activeObj)->cubeCube(cubeHwidth, 0.1, drawCursor);
     }
 }
 
@@ -281,7 +283,7 @@ void User::update(double t) {
     cam.up = up;
 
     // If the TempName is in the 'edit' state, update the drawing cursor.
-    if(world->state == edit) {
+    if((*activeObj)->state == edit) {
         updateDraw();
     }
 }
@@ -302,17 +304,19 @@ void User::updateDraw() {
     // Location of the draw cursor.
     glm::vec3 cursor = base + offset;
 
-    // Get the coordinates of the Cube containing the cursor.
-    float iscale = 1.f / (2.f * world->scale);
-    drawCursor.x = static_cast<int>(std::round(cursor.x * iscale));
-    drawCursor.y = static_cast<int>(std::round(cursor.y * iscale));
-    drawCursor.z = static_cast<int>(std::round(cursor.z * iscale));
+//    // Get the coordinates of the Cube containing the cursor.
+//    float iscale = 1.f / (2.f * world->scale);
+//    drawCursor.x = static_cast<int>(std::round(cursor.x * iscale));
+//    drawCursor.y = static_cast<int>(std::round(cursor.y * iscale));
+//    drawCursor.z = static_cast<int>(std::round(cursor.z * iscale));
+
+    drawCursor = (*activeObj)->centerFromPoint(cursor);
 
     // activeCubes index of the cursor location.
     auto key = glm::ivec3(drawCursor.x, drawCursor.y, drawCursor.z);
 
     // Indicates whether the Cube at the cursor location is in activeCubes
-    bool inMap = world->findIn(world->activeCubes, key);
+    bool inMap = (*activeObj)->findIn((*activeObj)->activeCubes, key);
 
     // Initialize drawing.
     if(drawStart) {
@@ -320,9 +324,9 @@ void User::updateDraw() {
 
         if(inMap) {
             // The Cube under the cursor is already in activeCubes.
-            Cube *c = world->activeCubes[key];
+            Cube *c = (*activeObj)->activeCubes[key];
 
-            if(c->live) {
+            if(c->state == 1) {
                 // The Cube is live. Draw dead Cubes.
                 drawDead = true;
             } else {
@@ -340,17 +344,17 @@ void User::updateDraw() {
     if(drawLive) {
         if(inMap) {
             // Access the Cube.
-            Cube *c = world->activeCubes[key];
+            Cube *c = (*activeObj)->activeCubes[key];
 
-            if(!c->live) {
+            if(c->state != 1) {
                 // Only do something if the Cube is dead.
-                world->flip(c);
+                dynamic_cast<CellularAutomaton*>(*activeObj)->flip(c);
             }
         } else {
             // No Cube in the activeCubes at the cursor. Create it, then flip its
             // state.
-            world->add(drawCursor.x, drawCursor.y, drawCursor.z);
-            world->flip(world->activeCubes[key]);
+            (*activeObj)->add(drawCursor.x, drawCursor.y, drawCursor.z);
+            dynamic_cast<CellularAutomaton*>(*activeObj)->flip((*activeObj)->activeCubes[key]);
         }
     }
 
@@ -358,11 +362,11 @@ void User::updateDraw() {
     if(drawDead) {
         if(inMap) {
             // Access the Cube.
-            Cube *c = world->activeCubes[key];
+            Cube *c = (*activeObj)->activeCubes[key];
 
-            if(c->live) {
+            if(c->state == 1) {
                 // Only do something if the Cube is alive.
-                world->flip(c);
+                dynamic_cast<CellularAutomaton*>(*activeObj)->flip(c);
             }
         }
         // No need to add a new Cube if the Cube under the cursor isn't

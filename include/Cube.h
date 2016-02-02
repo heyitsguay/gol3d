@@ -18,8 +18,11 @@ public:
     // Cube center coordinates.
     int x, y, z;
 
-    // Cube state: false = dead, true = live.
-    bool live;
+    // Cube center, vector form.
+    glm::ivec3 center;
+
+    // Cube state: 0 = dead, 1 = live, 2 = dying.
+    char state;
     
     // Number of live neighbors.
     char live_neighbors;

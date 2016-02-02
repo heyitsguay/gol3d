@@ -8,16 +8,14 @@
  * Generic Object initialization.
  * @constructor
  */
-Object::Object() : io(IO::getInstance()) {};
+Object::Object() : io(IO::getInstance()) {}
 
 /**
  * ~Object()
  * Generic Object destructor.
  * @destructor
  */
-Object::~Object() {
-    freeMemory();
-}
+Object::~Object() {}
 
 /**
  * Object.add()
@@ -49,6 +47,23 @@ void Object::add(int x, int y, int z) {
             activeCubes.insert({center, c});
         }
     }
+}
+
+/**
+ * Object.centerFromPoint()
+ * Returns the center (logical coordinates) of the Cube containing the input point, which is
+ * specified in spatial coordinates.
+ * @param point: The point to check.
+ */
+glm::ivec3 Object::centerFromPoint(glm::vec3 &point) {
+    // Translate the point relative to this Object's origin.
+    glm::vec3 translatedPoint = point - origin;
+    float iscale = 1.f / scale2;
+    auto out = glm::ivec3(0, 0, 0);
+    out.x = static_cast<int>(std::round(translatedPoint.x * iscale));
+    out.y = static_cast<int>(std::round(translatedPoint.y * iscale));
+    out.z = static_cast<int>(std::round(translatedPoint.z * iscale));
+    return out;
 }
 
 /**
@@ -118,7 +133,9 @@ void Object::init(glm::vec3 origin_, float scale_, int initNumCubes_) {
 
     state = stop;
 
-    cycle_stage = 0;
+    cycleStage = 0;
+
+    active = false;
 
     reset();
 }
@@ -144,8 +161,8 @@ void Object::remove(glm::ivec3 &center) {
 void Object::reset() {
     freeMemory();
 
-    // Reset cycle_stage.
-    cycle_stage = 0;
+    // Reset cycleStage.
+    cycleStage = 0;
 
     // Construct new Cubes.
     for(int i = 0; i < initNumCubes; ++i) {

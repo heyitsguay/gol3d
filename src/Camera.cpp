@@ -27,7 +27,7 @@ void Camera::handleInput() {
  * @param ratio: Window aspect ratio.
  */
 void Camera::init() {
-    fov = 55.f;
+    fov = 45.f;
     aspectRatio = 1.77777778f;
     drawDistance = 2000.f;
 

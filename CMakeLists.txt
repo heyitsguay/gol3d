@@ -12,13 +12,15 @@ set(SOURCE_FILES
         src/load_bmp.cpp
         src/load_obj.cpp
         src/Cube.cpp
-        src/TempName.cpp
         src/Camera.cpp
         src/IO.cpp
         src/Skybox.cpp
         src/User.cpp
         src/Application.cpp
-        src/Object.cpp)
+        src/Object.cpp
+        src/CellularAutomaton.cpp
+        src/World.cpp
+)
 add_executable(gol3d ${SOURCE_FILES})
 
 find_package(GLEW REQUIRED)
@@ -27,5 +29,17 @@ find_package(PkgConfig REQUIRED)
 find_package(SOIL REQUIRED)
 pkg_search_module(GLFW REQUIRED glfw3)
 
-include_directories(${CMAKE_SOURCE_DIR}/include ${GLEW_INCLUDE_DIRS} ${OpenGL_INCLUDE_DIRS} ${GLFW_INCLUDE_DIRS} ${SOIL_INCLUDE_DIRS})
-target_link_libraries(gol3d ${GLEW_LIBRARIES} ${OpenGL_LIBRARIES} ${GLFW_STATIC_LIBRARIES} ${SOIL_LIBRARIES})
+include_directories(
+        ${CMAKE_SOURCE_DIR}/include
+        ${GLEW_INCLUDE_DIRS}
+        ${OpenGL_INCLUDE_DIRS}
+        ${GLFW_INCLUDE_DIRS}
+        ${SOIL_INCLUDE_DIRS}
+)
+
+target_link_libraries(gol3d
+        ${GLEW_LIBRARIES}
+        ${OpenGL_LIBRARIES}
+        ${GLFW_STATIC_LIBRARIES}
+        ${SOIL_LIBRARIES}
+)

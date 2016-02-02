@@ -10,7 +10,8 @@
 #include <glm/glm.hpp>
 
 #include "Camera.h"
-#include "TempName.h"
+#include "CellularAutomaton.h"
+#include "World.h"
 
 #include "global.h"
 
@@ -21,8 +22,11 @@ private:
     // Camera reference.
     Camera &cam;
 
-    // TempName reference.
-    TempName *world;
+    // World reference.
+    World *world;
+
+    // Reference to the World's active Object.
+    Object **activeObj;
 
     // Max linear speed.
     const float max_speed = 80.f;
@@ -119,7 +123,7 @@ public:
 
     void handleInput();
     
-    void init(TempName *world_,
+    void init(World *world_,
               GLuint *programCursor_,
               glm::vec3 position_,
               float horizontalAngle_,

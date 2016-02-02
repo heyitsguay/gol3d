@@ -20,8 +20,8 @@ S3/B4: Similar to S9/B4 but with a paired linear puffer.
 */
 
 // GOL rules.
+int born_arr[] = {3};
 int stay_arr[] = {};
-int born_arr[] = {1};
 
 // Half-width of one side of the initial cube of Cubes.
 int hwidth = 5;
@@ -37,15 +37,23 @@ int main() {
     std::vector<int> stay (stay_arr, stay_arr + sizeof(stay_arr) / sizeof(int));
     // Born rule values.
     std::vector<int> born (born_arr, born_arr + sizeof(born_arr) / sizeof(int));
-    app.world.setRule(stay, born);
-    // Initialize to have some randomly-activated Cubes.
-    app.world.cubeCube(hwidth, 0.1);
-    app.world.state = run;
+
+    auto gol = CellularAutomaton();
+
+    auto stupid = glm::ivec3(0, 0, 0);
+    gol.init(glm::vec3(0, 0, 0), 0.5, 1000000);
+    gol.setRule(born, stay, true);
+    gol.cubeCube(hwidth, 0.1, stupid);
+    app.world.objects.push_back(&gol);
+    app.world.activate(app.world.objects[0]);
+
+//    app.world.setRule(stay, born);
+//    // Initialize to have some randomly-activated Cubes.
+//    app.world.cubeCube(hwidth, 0.1);
+//    app.world.state = run;
 
     // Main loop.
-    int temp = 100;
-//    while(!glfwWindowShouldClose(app.window)) {
-    while(temp--) {
+    while(!glfwWindowShouldClose(app.window)) {
         app.update();
         app.draw();
     }

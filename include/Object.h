@@ -23,18 +23,20 @@ typedef std::unordered_map<glm::ivec3, Cube*, KeyFuncs, KeyFuncs> cubeMap_t;
 typedef std::unordered_map<glm::ivec3, bool, KeyFuncs, KeyFuncs> boolMap_t;
 
 class Object {
-private:
+protected:
     // Tracks which part of the update cycle the Object is in.
-    int cycle_stage;
+    int cycleStage;
 
     // Reference to the IO handler.
     IO &io;
 
-    glm::ivec3 centerFromPoint(glm::vec3 &point);
-
 public:
     // Object state.
     State state;
+
+    // If true, this Object is the one the User is currently manipulating. The Object only
+    // responds to IO events when active.
+    bool active;
 
     // Vector containing all of the uninitialized Cubes.
     std::vector<Cube*> limbo;
@@ -68,6 +70,8 @@ public:
     virtual ~Object();
 
     void add(int x, int y, int z);
+
+    glm::ivec3 centerFromPoint(glm::vec3 &point);
 
     bool checkPoint(glm::vec3 &point);
 

@@ -3,3 +3,6 @@ push
 
 # Vim/gedit backup files.
 *~
+
+# Old stuff
+old/

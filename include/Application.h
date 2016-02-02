@@ -64,8 +64,8 @@ public:
     // The Skybox.
     Skybox skybox;
 
-    // The TempName.
-    TempName world;
+    // The World.
+    World world;
 
     // The User.
     User user;

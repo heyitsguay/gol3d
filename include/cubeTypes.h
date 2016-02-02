@@ -39,9 +39,11 @@
 #define T_PUMPKIN 26
 #define T_CAKE 27
 #define T_BLANK 28
+#define T_DYING 29
+#define T_BORDERDYING 30
 
 // Define type base coordinates.
-const static glm::ivec2 typeBase[29] = {
+const static glm::ivec2 typeBase[31] = {
         glm::ivec2(0, 0),
         glm::ivec2(1, 0),
         glm::ivec2(2, 0),
@@ -70,7 +72,9 @@ const static glm::ivec2 typeBase[29] = {
         glm::ivec2(3, 4),
         glm::ivec2(7, 7),
         glm::ivec2(9, 7),
-        glm::ivec2(0, 8)
+        glm::ivec2(0, 8),
+        glm::ivec2(1, 8),
+        glm::ivec2(2, 8)
 };
 
 
