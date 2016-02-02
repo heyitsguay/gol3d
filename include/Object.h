@@ -76,7 +76,7 @@ public:
     bool checkPoint(glm::vec3 &point);
 
     template<typename T>
-    bool findIn(std::unordered_map<glm::ivec3, T, KeyFuncs, KeyFuncs> &map, glm::ivec3 center);
+    bool findIn(const std::unordered_map<glm::ivec3, T, KeyFuncs, KeyFuncs> &map, const glm::ivec3 &center);
 
     void freeMemory();
 

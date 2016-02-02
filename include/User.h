@@ -69,6 +69,8 @@ private:
     bool drawLive;
     // If true, draw dead Cubes at the cursor.
     bool drawDead;
+    // If true, draw dying Cubes at the cursor.
+    bool drawDying;
     // Half width of drawn Cube cubes.
     int cubeHwidth;
     // Draw cursor offset from heading basepoint.

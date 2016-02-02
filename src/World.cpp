@@ -5,6 +5,7 @@
 
 #include <SOIL/SOIL.h>
 
+#include "global.h"
 #include "opengl-debug.h"
 
 World::World() :
@@ -86,6 +87,8 @@ void World::draw(float t) {
     // Draw.
     if(drawCount > 0) {
         glUniformMatrix4fv(uMVP, 1, GL_FALSE, &(cam.VP)[0][0]);
+        glUniform1f(uhBase, baseCubeH);
+        glUniform1f(uvaryColor, varyColor);
         glUniform3fv(ucameraPos, 1, &cam.position[0]);
         glUniform1f(ut, t);
         glUniform1i(sAtlas, 1);
@@ -117,7 +120,21 @@ void World::draw(float t) {
  * Handles all user input to the World.
  */
 void World::handleInput() {
-    // Do nothing, for now.
+    // Hue change increment.
+    float dH = 0.01;
+    // Increase Cube base hue.
+    if(io.pressed(GLFW_KEY_EQUAL)) {
+        baseCubeH = (float)pmod(baseCubeH + dH, 1.f);
+
+    // Decrease Cube base hue.
+    } else if(io.pressed(GLFW_KEY_MINUS)) {
+        baseCubeH = (float)pmod(baseCubeH - dH, 1.f);
+    }
+
+    // Toggle flat shading.
+    if(io.toggled(GLFW_KEY_N)) {
+        varyColor = 1.f - varyColor;
+    }
 }
 
 /**
@@ -140,6 +157,8 @@ void World::init(GLuint *cubeVAO_, GLuint *program_) {
 void World::initGL() {
     // Get GLSL uniform pointers.
     uMVP = (GLuint) glGetUniformLocation(*program, "u_MVP");
+    uvaryColor = (GLuint) glGetUniformLocation(*program, "u_vary_color");
+    uhBase = (GLuint) glGetUniformLocation(*program, "u_h_base");
     ucameraPos = (GLuint) glGetUniformLocation(*program, "u_camera_pos");
     ut = (GLuint) glGetUniformLocation(*program, "u_t");
 

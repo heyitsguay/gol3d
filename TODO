@@ -1,14 +1,14 @@
-Next: Rewrite the TempName!!
+Next:
 
-- 013016: Add a new World class to handle all the Objects.
-- 013016: Make the TempName's update cycle dynamic, to cope with different numbers of Cubes.
-- 013016: Add a Brian's brain CA mode.
+
+- 013016: Make the CellularAutomaton's update cycle dynamic, to cope with different numbers of Cubes.
 - 012916: Get the low and medium quality displays working.
 - 012616: Add a menu system for interaction.
-- 012616: Rewrite the TempName class as a subclass of an abstract 'Object' class.
 - 012616: Add Cube <-> User collision detection and User gravity.
 
-
+x 013016: Add a new World class to handle all the Objects. (DONE 020116)
+x 012616: Rewrite the World(>CellularAutomaton) class as a subclass of an abstract 'Object' class. (DONE 020116)
+x 013016: Add a Brian's brain CA mode. (DONE 020116)
 x 012716: Use a custom hash function to allow the TempName hashmaps to use 3D coordinates as a key. (DONE 013016)
 x 012716: Change TempName's 'limbo' object to be a vector instead of a queue. (DONE 013016)
 x 012816: Change the Cube coord tuples into glm::ivec3's. (DONE 013016)

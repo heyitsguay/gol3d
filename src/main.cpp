@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
+#include <sstream>
 #include <vector>
 
 #include <unistd.h>
@@ -15,47 +16,122 @@
 #include "Application.h"
 
 /* Fun rule sets discovered so far:
-S9/B4: Fractal growth of certain patterns, lots of gliders.
-S3/B4: Similar to S9/B4 but with a paired linear puffer.
+ * [Born live neighbor counts/Stay live neighbor counts/Use Brian's brain mode]
+ B4/S9/F: Fractal growth of certain patterns, lots of gliders.
+ B4/S3/F: Similar to S9/B4 but with a paired linear puffer.
+ B4,9/S5,10/T: Fancy gliders and puffers and more. Slightly explosive.
+ B4,9/S5,12/T: Similar to B4,9/S5,10/T, but less unstable so far.
 */
 
 // GOL rules.
-int born_arr[] = {3};
-int stay_arr[] = {};
+int bornArr[] = {6};
+int stayArr[] = {};
+bool useBBIn = true;
 
 // Half-width of one side of the initial cube of Cubes.
 int hwidth = 5;
 
-int main() {
+// http://stackoverflow.com/a/236803/5719731
+std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
+    std::stringstream ss(s);
+    std::string item;
+    while (std::getline(ss, item, delim)) {
+        elems.push_back(item);
+    }
+    return elems;
+}
+
+void processInputs(int argc,
+                   char **argv,
+                   bool &valgrindTest,
+                   std::vector<int> &born,
+                   std::vector<int> &stay,
+                   bool &useBB) {
+    if(argc == 2) {
+        valgrindTest = (atoi(argv[1]) > 0);
+
+    } else {
+        valgrindTest = false;
+    }
+
+    // Three inputs - you're probably specifying which rule to use.
+    if(argc == 4) {
+        // User specified rules, as strings.
+        std::string bornStr = argv[1];
+        std::string stayStr = argv[2];
+        // Third argument determines whether to use Brian's brain mode.
+        int useBBArg = atoi(argv[3]);
+        useBB = (useBBArg > 0);
+
+
+        // Split into numbers, with "," as a delimiter.
+        std::vector<std::string> bornEls, stayEls;
+        split(bornStr, ',', bornEls);
+        split(stayStr, ',', stayEls);
+
+        // Convert those string vectors into int vectors.
+        for(auto &x : bornEls) {
+            int xi = stoi(x);
+            if(xi >= 0 && xi < 27) {
+                born.push_back(xi);
+            }
+        }
+        for(auto &x : stayEls) {
+            int xi = stoi(x);
+            if(xi >= 0 && xi < 27) {
+                stay.push_back(xi);
+            }
+        }
+
+    } else {
+        // Use default args.
+        int bornArrSize = sizeof(bornArr) / sizeof(int);
+        int stayArrSize = sizeof(stayArr) / sizeof(int);
+
+        born.insert(born.end(), &bornArr[0], &bornArr[bornArrSize]);
+        stay.insert(stay.end(), &stayArr[0], &stayArr[stayArrSize]);
+        useBB = useBBIn;
+    }
+}
+
+int main(int argc, char **argv) {
+    // Used for setting up the CA rules.
+    std::vector<int> born, stay;
+    bool useBB;
+
+    // Use inputs to put the application into test mode for valgrind.
+    bool valgrindTest;
+
+    processInputs(argc, argv, valgrindTest, born, stay, useBB);
+
     // Create and initialize the Application.
     Application &app = Application::getInstance();
 //    app.init(1, QUALITY_LAPTOP);
-    app.init(1);
+    app.init(0, QUALITY_LAPTOP);
 
     // GOL3D setup.
-    // Stay rule values.
-    std::vector<int> stay (stay_arr, stay_arr + sizeof(stay_arr) / sizeof(int));
-    // Born rule values.
-    std::vector<int> born (born_arr, born_arr + sizeof(born_arr) / sizeof(int));
-
     auto gol = CellularAutomaton();
 
     auto stupid = glm::ivec3(0, 0, 0);
     gol.init(glm::vec3(0, 0, 0), 0.5, 1000000);
-    gol.setRule(born, stay, true);
+    gol.setRule(born, stay, useBB);
     gol.cubeCube(hwidth, 0.1, stupid);
+    
     app.world.objects.push_back(&gol);
     app.world.activate(app.world.objects[0]);
 
-//    app.world.setRule(stay, born);
-//    // Initialize to have some randomly-activated Cubes.
-//    app.world.cubeCube(hwidth, 0.1);
-//    app.world.state = run;
-
     // Main loop.
-    while(!glfwWindowShouldClose(app.window)) {
-        app.update();
-        app.draw();
+    if(valgrindTest) {
+        int testCycle = 100;
+        while(testCycle--) {
+            app.update();
+            app.draw();
+        }
+    } else {
+        while (!glfwWindowShouldClose(app.window)) {
+            app.update();
+            app.draw();
+        }
     }
 
     usleep(250000);

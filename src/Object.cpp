@@ -86,11 +86,11 @@ bool Object::checkPoint(glm::vec3 &point) {
  * @param center: The key to search for.
  */
 template<typename T>
-bool Object::findIn(std::unordered_map<glm::ivec3, T, KeyFuncs, KeyFuncs> &map, glm::ivec3 center) {
+bool Object::findIn(const std::unordered_map<glm::ivec3, T, KeyFuncs, KeyFuncs> &map, const glm::ivec3 &center) {
     return (map.find(center) != map.end());
 }
-template bool Object::findIn<Cube*>(cubeMap_t &map, glm::ivec3 center);
-template bool Object::findIn<bool>(boolMap_t &map, glm::ivec3 center);
+template bool Object::findIn<Cube*>(const cubeMap_t &map, const glm::ivec3 &center);
+template bool Object::findIn<bool>(const boolMap_t  &map, const glm::ivec3 &center);
 
 /**
  * Object.freeMemory

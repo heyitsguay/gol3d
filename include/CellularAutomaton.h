@@ -14,7 +14,7 @@ private:
 
     // Indicates whether the CellularAutomaton is currently 'stepping' - updating one time,
     // while not in the run state.
-    bool stepping;
+    bool stepping = false;
 
     // Indicates which update cycle position to update to, while stepping.
     int stepStart;

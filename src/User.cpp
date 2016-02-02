@@ -23,13 +23,13 @@ void User::computeHeadingBasis() {
             std::cos(verticalAngle) * std::cos(horizontalAngle)
     );
     // Right vector.
-    right = -glm::vec3(
+    right = glm::vec3(
             std::sin(horizontalAngle - PI / 2),
             0,
             std::cos(horizontalAngle - PI / 2)
     );
     // Up vector.
-    up = -glm::cross(right, heading);
+    up = glm::cross(right, heading);
 }
 
 /**
@@ -178,6 +178,8 @@ void User::handleInput() {
     if(io.released(GLFW_KEY_SPACE)) {
         drawLive = false;
         drawDead = false;
+        drawDying = false;
+
     }
 
     // Create a Cube cube.
@@ -233,6 +235,7 @@ void User::init(World *world_,
     drawStart = false;
     drawLive = false;
     drawDead = false;
+    drawDying = false;
     cubeHwidth = 4;
 
     // OpenGL setup.
