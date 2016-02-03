@@ -21,6 +21,7 @@
  B4/S3/F: Similar to S9/B4 but with a paired linear puffer.
  B4,9/S5,10/T: Fancy gliders and puffers and more. Slightly explosive.
  B4,9/S5,12/T: Similar to B4,9/S5,10/T, but less unstable so far.
+ B4/S1,9/T: Several interesting puffers.
 */
 
 // GOL rules.
@@ -107,7 +108,7 @@ int main(int argc, char **argv) {
     // Create and initialize the Application.
     Application &app = Application::getInstance();
 //    app.init(1, QUALITY_LAPTOP);
-    app.init(0, QUALITY_LAPTOP);
+    app.init(1);
 
     // GOL3D setup.
     auto gol = CellularAutomaton();
