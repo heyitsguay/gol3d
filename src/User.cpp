@@ -296,6 +296,9 @@ void User::update(double t) {
  * Updates the drawing cursor, and performs any drawing actions.
  */
 void User::updateDraw() {
+    // Object we're drawing. Assume it's a CellularAutomaton for now. TODO: make this better.
+    CellularAutomaton* obj = dynamic_cast<CellularAutomaton*>(*activeObj);
+
     // Base cursor location will be the Cube containing this point.
     glm::vec3 base = position + baseDrawDist * heading;
 
@@ -307,19 +310,13 @@ void User::updateDraw() {
     // Location of the draw cursor.
     glm::vec3 cursor = base + offset;
 
-//    // Get the coordinates of the Cube containing the cursor.
-//    float iscale = 1.f / (2.f * world->scale);
-//    drawCursor.x = static_cast<int>(std::round(cursor.x * iscale));
-//    drawCursor.y = static_cast<int>(std::round(cursor.y * iscale));
-//    drawCursor.z = static_cast<int>(std::round(cursor.z * iscale));
-
-    drawCursor = (*activeObj)->centerFromPoint(cursor);
+    drawCursor = obj->centerFromPoint(cursor);
 
     // activeCubes index of the cursor location.
     auto key = glm::ivec3(drawCursor.x, drawCursor.y, drawCursor.z);
 
     // Indicates whether the Cube at the cursor location is in activeCubes
-    bool inMap = (*activeObj)->findIn((*activeObj)->activeCubes, key);
+    bool inMap = obj->findIn(obj->activeCubes, key);
 
     // Initialize drawing.
     if(drawStart) {
@@ -327,13 +324,24 @@ void User::updateDraw() {
 
         if(inMap) {
             // The Cube under the cursor is already in activeCubes.
-            Cube *c = (*activeObj)->activeCubes[key];
+            Cube *c = obj->activeCubes[key];
 
             if(c->state == 1) {
-                // The Cube is live. Draw dead Cubes.
+                // Cube *c is live.
+                if (obj->numStates == 2) {
+                    // Game of Life mode, next state is dead.
+                    drawDead = true;
+                } else {
+                    // Brian's brain mode, next state is dying.
+                    drawDying = true;
+                }
+
+            } else if(c->state == 2) {
+                // Cube *c is dying, next state is dead.
                 drawDead = true;
+
             } else {
-                // The Cube is dead. Draw live Cubes.
+                // Cube *c is dead, next state is dying.
                 drawLive = true;
             }
         } else {
@@ -347,17 +355,33 @@ void User::updateDraw() {
     if(drawLive) {
         if(inMap) {
             // Access the Cube.
-            Cube *c = (*activeObj)->activeCubes[key];
+            Cube *c = obj->activeCubes[key];
 
             if(c->state != 1) {
-                // Only do something if the Cube is dead.
-                dynamic_cast<CellularAutomaton*>(*activeObj)->flip(c);
+                // Only do something if the Cube is not live.
+                obj->setCube(c, 1);
             }
         } else {
-            // No Cube in the activeCubes at the cursor. Create it, then flip its
+            // No Cube in the activeCubes at the cursor. Create it, then set its
             // state.
-            (*activeObj)->add(drawCursor.x, drawCursor.y, drawCursor.z);
-            dynamic_cast<CellularAutomaton*>(*activeObj)->flip((*activeObj)->activeCubes[key]);
+            obj->add(drawCursor.x, drawCursor.y, drawCursor.z);
+            obj->setCube(obj->activeCubes[key], 1);
+        }
+
+    // Draw dying Cubes at the Cursor.
+    } else if(drawDying) {
+        if(inMap) {
+            // Access the Cube.
+            Cube *c = obj->activeCubes[key];
+
+            if(c->state != 2) {
+                // Only do something if the Cube is not dying.
+                obj->setCube(c, 2);
+            }
+        } else {
+            // No Cube in activeCubes at the cursor. Create it, then set its state.
+            obj->add(drawCursor.x, drawCursor.y, drawCursor.z);
+            obj->setCube(obj->activeCubes[key], 2);
         }
     }
 
@@ -365,11 +389,11 @@ void User::updateDraw() {
     if(drawDead) {
         if(inMap) {
             // Access the Cube.
-            Cube *c = (*activeObj)->activeCubes[key];
+            Cube *c = obj->activeCubes[key];
 
-            if(c->state == 1) {
-                // Only do something if the Cube is alive.
-                dynamic_cast<CellularAutomaton*>(*activeObj)->flip(c);
+            if(c->state != 0) {
+                // Only do something if the Cube isn't dead
+                obj->setCube(c, 0);
             }
         }
         // No need to add a new Cube if the Cube under the cursor isn't

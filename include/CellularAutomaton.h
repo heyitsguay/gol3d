@@ -9,9 +9,6 @@
 
 class CellularAutomaton : public Object {
 private:
-    // Indicates whether to run the CellularAutomaton in Brian's brain mode or not.
-    bool bbMode;
-
     // Indicates whether the CellularAutomaton is currently 'stepping' - updating one time,
     // while not in the run state.
     bool stepping = false;
@@ -38,6 +35,10 @@ public:
     bool stay[27];
     bool born[27];
 
+    // Number of Cube states - indicates whether we're in regular Game of Life mode
+    // (2 states) or Brian's brain mode (3 states).
+    int numStates;
+
     CellularAutomaton();
     ~CellularAutomaton();
 
@@ -47,7 +48,9 @@ public:
 
     virtual void handleInput();
 
-    void setRule(std::vector<int> born_vals, std::vector<int> stay_vals, bool bbMode_);
+    void setCube(Cube *c, int state);
+
+    void setRule(std::vector<int> born_vals, std::vector<int> stay_vals, bool bbMode);
 
     virtual void update();
 };

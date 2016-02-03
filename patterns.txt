@@ -1,0 +1,18 @@
+Notes on rule sets discovered so far:
+**: Very interesting
+ *: Possibly interesting 
+[Birth values/Stay values]
+
+Game of Life
+============
+ *B4/S9: Fractal growth of certain patterns, lots of gliders.
+**B4/S3: Similar to S9/B4 but with a paired linear puffer.
+
+
+Brian's Brain
+=============
+ *B4/S1,8: Evaporative, but with explosive rakes and many static gliders.
+  B4,9/S5,10: Fancy gliders and puffers and more. Slightly explosive.
+ *B4,9/S5,12: Similar to B4,9/S5,10/T, but less unstable so far.
+**B4,10/S5,12: Crazy puffers and rakes and gliders guns and more.
+ *B4/S1,9: Several interesting puffers.

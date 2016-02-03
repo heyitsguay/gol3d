@@ -15,15 +15,6 @@
 
 #include "Application.h"
 
-/* Fun rule sets discovered so far:
- * [Born live neighbor counts/Stay live neighbor counts/Use Brian's brain mode]
- B4/S9/F: Fractal growth of certain patterns, lots of gliders.
- B4/S3/F: Similar to S9/B4 but with a paired linear puffer.
- B4,9/S5,10/T: Fancy gliders and puffers and more. Slightly explosive.
- B4,9/S5,12/T: Similar to B4,9/S5,10/T, but less unstable so far.
- B4/S1,9/T: Several interesting puffers.
-*/
-
 // GOL rules.
 int bornArr[] = {6};
 int stayArr[] = {};

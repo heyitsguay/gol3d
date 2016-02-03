@@ -52,14 +52,9 @@ void CellularAutomaton::cubeCube(int hwidth, float p, glm::ivec3 center) {
  * @param c: Pointer to the Cube whose state is being toggled.
  */
 void CellularAutomaton::flip(Cube *c) {
-    // If in Brian's brain mode, increment the state by 1 (mod 3). Otherwise, toggle between
-    // 0 and 2.
-    if(bbMode) {
-        c->state = char((c->state + 1) % 3);
+    // Increment state (mod numStates).
+    c->state = (c->state + 1) % numStates;
 
-    } else {
-        c->state = (char)1 - c->state;
-    }
 
     // Update the Cube's status in drawCubes.
     if(c->state == 0) {
@@ -124,6 +119,50 @@ void CellularAutomaton::handleInput() {
 }
 
 /**
+ * CellularAutomaton.setCube()
+ * Sets Cube *c's state to (state).
+ * @param c: Pointer to the Cube whose state is being set.
+ * @param state: State to set *c to.
+ */
+void CellularAutomaton::setCube(Cube *c, int state) {
+
+    // Use this to track any changes in the Cube's state.
+    int prevState = c->state;
+
+    // Only update the Cube and its neighbors if the state changed.
+    if(state != prevState) {
+        // Set state.
+        c->state = state;
+
+        // Update the Cube's status in drawCubes.
+        if (c->state == 0) {
+            // Cube is dead, don't draw it.
+            drawCubes.erase(c->center);
+
+        } else if (prevState == 0) {
+            // Cube is newly live or dying, add it to drawCubes.
+            drawCubes.insert({c->center, c});
+        }
+
+        // Add neighbors to addCubes if they're not they're already.
+        for (int dx = -1; dx <= 1; ++dx) {
+            int X = c->x + dx;
+            for (int dy = -1; dy <= 1; ++dy) {
+                int Y = c->y + dy;
+                for (int dz = -1; dz <= 1; ++dz) {
+                    int Z = c->z + dz;
+
+                    auto newCenter = glm::ivec3(X, Y, Z);
+                    if (!findIn(addCubes, newCenter)) {
+                        addCubes.insert({newCenter, true});
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
  * CellularAutomaton.setRule()
  * Sets the update rule for the Cube states.
  * @param stay_vals: A live Cube stays live if its live neighbor count is an element of this vector.
@@ -131,7 +170,7 @@ void CellularAutomaton::handleInput() {
  * @param bbMode: If true, run the CellularAutomaton in Brian's brain mode (live Cubes have a 'dying'
  *                state for one update cycle before becoming dead).
  */
-void CellularAutomaton::setRule(std::vector<int> born_vals, std::vector<int> stay_vals, bool bbMode_) {
+void CellularAutomaton::setRule(std::vector<int> born_vals, std::vector<int> stay_vals, bool bbMode) {
     // Reset the rule arrays.
     for(int i = 0; i < 27; ++i) {
         born[i] = false;
@@ -151,7 +190,11 @@ void CellularAutomaton::setRule(std::vector<int> born_vals, std::vector<int> sta
     }
 
     // Specify whether or not to use Brian's brain mode.
-    bbMode = bbMode_;
+    if(bbMode) {
+        numStates = 3;
+    } else {
+        numStates = 2;
+    }
 }
 
 /**
@@ -225,18 +268,6 @@ void CellularAutomaton::updateActiveCubes() {
  * Counts the number of live Cubes neighboring each Cube in activeCubes.
  */
 void CellularAutomaton::updateNeighborCount() {
-    // Iterate through at most this number of live Cubes in activeCubes per frame.
-//    static int updateCount = 500000;
-    // When true, reset iter at the start of the update.
-//    static bool resetIter = true;
-    // Iterator through activeCubes.
-//    static auto iter = activeCubes.begin();
-
-//    if(resetIter) {
-//        iter = activeCubes.begin();
-//    }
-
-//    while(updateCount > 0 && iter != activeCubes.end()) {
     for(auto iter = activeCubes.begin(); iter != activeCubes.end(); ++iter) {
         Cube *c = iter->second;
 
@@ -263,24 +294,9 @@ void CellularAutomaton::updateNeighborCount() {
                     }
                 }
             }
-
-//            updateCount--;
         }
-//        ++iter;
     }
-
-    // Escaped the while loop. Either we ran out of update iterations for this frame, or we
-    // reached the end of activeCubes.
-//    if(iter == activeCubes.end()) {
-        // Reached the end of activeCubes. Reset static variables, advance to the
-        // next stage of the update cycle.
-//        resetIter = true;
-//        cycleStage++;
-//    }
     cycleStage++;
-
-    // Reset updateCount for the next round of neighbor updates.
-//    updateCount = 500000;
 }
 
 /**
@@ -302,18 +318,6 @@ void CellularAutomaton::updateResetCount() {
  * Updates the state of each Cube in activeCubes.
  */
 void CellularAutomaton::updateState() {
-    // Iterate through at most this number of live Cubes in activeCubes per frame.
-//    static int updateCount = 500000;
-    // When true, reset iter to activeCubes.begin();
-//    static bool resetIter = true;
-    // Iterator through activeCubes.
-//    static auto iter = activeCubes.begin();
-
-//    if(resetIter) {
-//        iter = activeCubes.begin();
-//    }
-
-//    while(updateCount > 0 && iter != activeCubes.end()) {
     for(auto iter = activeCubes.begin(); iter != activeCubes.end(); ++iter) {
         Cube *c = iter->second;
 
@@ -342,20 +346,7 @@ void CellularAutomaton::updateState() {
             flip(c);
         }
 
-//        updateCount--;
-//        resetIter = true;
     }
 
-    // Escaped the while loop. Either we ran out of update iterations for this frame, or we
-    // reached the end of activeCubes.
-//    if(iter == activeCubes.end()) {
-        // Reached the end of activeCubes. Reset static variables, advance to the
-        // next stage of the update cycle.
-//        iter = activeCubes.begin();
-//        cycleStage++;
-//    }
-
     cycleStage++;
-    // Reset updateCount for the next round of neighbor updates.
-//    updateCount = 500000;
 }

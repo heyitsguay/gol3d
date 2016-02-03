@@ -22,7 +22,7 @@ public:
     glm::ivec3 center;
 
     // Cube state: 0 = dead, 1 = live, 2 = dying.
-    char state;
+    int state;
     
     // Number of live neighbors.
     char live_neighbors;
