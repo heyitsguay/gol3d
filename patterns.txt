@@ -14,5 +14,6 @@ Brian's Brain
  *B4/S1,8: Evaporative, but with explosive rakes and many static gliders.
   B4,9/S5,10: Fancy gliders and puffers and more. Slightly explosive.
  *B4,9/S5,12: Similar to B4,9/S5,10/T, but less unstable so far.
+**B4,10/S1,9: explosive rakes, glider guns that create expanding diamonds. 
 **B4,10/S5,12: Crazy puffers and rakes and gliders guns and more.
  *B4/S1,9: Several interesting puffers.

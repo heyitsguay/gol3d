@@ -18,7 +18,8 @@ void IO::operator=(IO const&) {};
  * @param ypos: Cursor y position, relative to the window's top edge.
  */
 void IO::cursorPosCallback(GLFWwindow *window, double xpos, double ypos) {
-    // Do nothing for now.
+    mouseX = xpos;
+    mouseY = ypos;
 }
 
 /**
@@ -101,4 +102,18 @@ bool IO::toggled(int key) {
         tflag[key] = false;
     }
     return t;
+}
+
+/**
+ * IO.update()
+ * The IO update function.
+ */
+void IO::update() {
+    // Update dmouse variables.
+    dmouseX = mouseX - pmouseX;
+    dmouseY = mouseY - pmouseY;
+
+    // Update previous cursor position.
+    pmouseX = mouseX;
+    pmouseY = mouseY;
 }

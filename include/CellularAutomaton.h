@@ -6,6 +6,7 @@
 
 #ifndef GOL3D_CELLULARAUTOMATON_H
 #define GOL3D_CELLULARAUTOMATON_H
+#pragma once
 
 class CellularAutomaton : public Object {
 private:

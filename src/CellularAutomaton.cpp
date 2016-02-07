@@ -66,15 +66,16 @@ void CellularAutomaton::flip(Cube *c) {
         drawCubes.insert({c->center, c});
     }
 
+    glm::ivec3 newCenter;
+
     // Add neighbors to addCubes if they're not they're already.
     for (int dx = -1; dx <= 1; ++dx) {
-        int X = c->x + dx;
+        newCenter.x = c->x + dx;
         for (int dy = -1; dy <= 1; ++dy) {
-            int Y = c->y + dy;
+            newCenter.y = c->y + dy;
             for (int dz = -1; dz <= 1; ++dz) {
-                int Z = c->z + dz;
+                newCenter.z = c->z + dz;
 
-                auto newCenter = glm::ivec3(X, Y, Z);
                 if (!findIn(addCubes, newCenter)) {
                     addCubes.insert({newCenter, true});
                 }
@@ -94,20 +95,22 @@ void CellularAutomaton::handleInput() {
         if(io.toggled(GLFW_KEY_1)) {
             state = stop;
 
-        } else if(io.toggled(GLFW_KEY_2)) {
-            state = edit;
-
-            // Push to the end of the update cycle to make sure newly-inserted Cubes
-            // are updated properly.
-            cycleStage = 4;
+//        } else if(io.toggled(GLFW_KEY_2)) {
+//            state = edit;
+//
+//            // Push to the end of the update cycle to make sure newly-inserted Cubes
+//            // are updated properly.
+//            cycleStage = 4;
 
         } else if(io.toggled(GLFW_KEY_3)) {
             state = run;
 
         } else if(io.toggled(GLFW_KEY_E)) {
-            // Step forward one step.
-            if(!stepping && state != run) {
-                stepping = true;
+            // Step forward one step, if stopped.
+            if(state == stop) {
+                state = step;
+                // Record which stage of the update cycle the step
+                // starts on.
                 stepStart = cycleStage;
             }
 
@@ -205,7 +208,9 @@ void CellularAutomaton::update() {
     // Handle user input.
     handleInput();
 
-    if(active && (state == run || stepping)) {
+    // If this is the active Object, and it's in the 'run' state or
+    // undergoing a single update step, update.
+    if(active && (state != stop)) {
         // Track the cycleStage at the beginning of each frame's update, to see when it changes.
         int initCycleStage = cycleStage;
 
@@ -230,9 +235,9 @@ void CellularAutomaton::update() {
             abort();
         }
 
-        if(initCycleStage != cycleStage && cycleStage == stepStart) {
+        if(state == step && initCycleStage != cycleStage && cycleStage == stepStart) {
             // We've made one loop through the update cycle since beginning a step.
-            stepping = false;
+            state = stop;
         }
     }
 }

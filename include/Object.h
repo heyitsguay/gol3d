@@ -17,7 +17,7 @@
 #include "ivecHash.h"
 
 // Possible Object update states.
-enum State {stop, edit, run};
+enum ObjectState {stop, step, run};
 
 typedef std::unordered_map<glm::ivec3, Cube*, KeyFuncs, KeyFuncs> cubeMap_t;
 typedef std::unordered_map<glm::ivec3, bool, KeyFuncs, KeyFuncs> boolMap_t;
@@ -32,7 +32,7 @@ protected:
 
 public:
     // Object state.
-    State state;
+    ObjectState state;
 
     // If true, this Object is the one the User is currently manipulating. The Object only
     // responds to IO events when active.
