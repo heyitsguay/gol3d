@@ -1,5 +1,5 @@
 # Game of Life 3D
-Build using CMake, run from the terminal. 
+Currently tested only on 64-bit Ubuntu 15.10. Build using CMake, run from the terminal. Requires OpenGL 3.3, GLEW, GLFW 3, SOIL, and pkg-config.
 
 Check out patterns.txt for some examples of interesting rule sets.
 
