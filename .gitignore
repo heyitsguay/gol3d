@@ -4,5 +4,11 @@ push
 # Vim/gedit backup files.
 *~
 
-# Old stuff
+# Old stuff.
 old/
+
+# Binaries.
+bin/
+
+# CLion files.
+.idea/

@@ -95,13 +95,6 @@ void CellularAutomaton::handleInput() {
         if(io.toggled(GLFW_KEY_1)) {
             state = stop;
 
-//        } else if(io.toggled(GLFW_KEY_2)) {
-//            state = edit;
-//
-//            // Push to the end of the update cycle to make sure newly-inserted Cubes
-//            // are updated properly.
-//            cycleStage = 4;
-
         } else if(io.toggled(GLFW_KEY_3)) {
             state = run;
 
@@ -262,9 +255,9 @@ void CellularAutomaton::updateActiveCubes() {
     addCubes.clear();
     removeCubes.clear();
 
-    if(stepStart == cycleStage) {
-
-    }
+//    if(stepStart == cycleStage) {
+//
+//    }
     cycleStage++;
 }
 

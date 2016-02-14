@@ -73,8 +73,13 @@ private:
     bool drawDead;
     // If true, draw dying Cubes at the cursor.
     bool drawDying;
+
     // Half width of drawn Cube cubes.
     int cubeHwidth;
+    // Cube cube density (activation probability).
+    float cubeP = 0.1f;
+
+
     // Draw cursor offset from heading basepoint.
     glm::vec3 cursorOffset;
     // Determines how far along the heading vector the draw cursor basepoint is.

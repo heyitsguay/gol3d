@@ -15,13 +15,66 @@
 
 #include "Application.h"
 
-// GOL rules.
-int bornArr[] = {6};
-int stayArr[] = {};
+// Default GOL rules.
+int bornArr[] = {4, 10};
+int stayArr[] = {12};
 bool useBBIn = true;
 
 // Half-width of one side of the initial cube of Cubes.
 int hwidth = 5;
+
+std::vector<std::string> &split(const std::string&, char, std::vector<std::string>&);
+void processInputs(int, char**, bool&, std::vector<int>&, std::vector<int>&, bool&);
+
+int main(int argc, char **argv) {
+    // Used for setting up the CA rules.
+    std::vector<int> born, stay;
+    bool useBB;
+
+    // Use inputs to put the application into test mode for valgrind.
+    bool valgrindTest;
+
+    processInputs(argc, argv, valgrindTest, born, stay, useBB);
+
+    // Create and initialize the Application.
+    Application &app = Application::getInstance();
+    app.init(1, QUALITY_LAPTOP);
+//    app.init(1);
+
+    // GOL3D setup.
+    auto gol = CellularAutomaton();
+
+    auto stupid = glm::ivec3(0, 0, 0);
+    gol.init(glm::vec3(0, 0, 0), 0.5, 1000000);
+    gol.setRule(born, stay, useBB);
+    gol.cubeCube(hwidth, 0.1, stupid);
+    
+    app.world.objects.push_back(&gol);
+    app.world.activate(app.world.objects[0]);
+
+    // Main loop.
+    if(valgrindTest) {
+        int testCycle = 100;
+        while(testCycle--) {
+            app.update();
+            app.draw();
+        }
+    } else {
+        while (!glfwWindowShouldClose(app.window)) {
+            app.update();
+            app.draw();
+        }
+    }
+
+    usleep(250000);
+
+    // Close OpenGL window and terminate GLFW
+    glfwTerminate();
+
+    app.terminate();
+
+    return 0;
+}
 
 // http://stackoverflow.com/a/236803/5719731
 std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
@@ -84,54 +137,4 @@ void processInputs(int argc,
         stay.insert(stay.end(), &stayArr[0], &stayArr[stayArrSize]);
         useBB = useBBIn;
     }
-}
-
-int main(int argc, char **argv) {
-    // Used for setting up the CA rules.
-    std::vector<int> born, stay;
-    bool useBB;
-
-    // Use inputs to put the application into test mode for valgrind.
-    bool valgrindTest;
-
-    processInputs(argc, argv, valgrindTest, born, stay, useBB);
-
-    // Create and initialize the Application.
-    Application &app = Application::getInstance();
-//    app.init(1, QUALITY_LAPTOP);
-    app.init(1);
-
-    // GOL3D setup.
-    auto gol = CellularAutomaton();
-
-    auto stupid = glm::ivec3(0, 0, 0);
-    gol.init(glm::vec3(0, 0, 0), 0.5, 1000000);
-    gol.setRule(born, stay, useBB);
-    gol.cubeCube(hwidth, 0.1, stupid);
-    
-    app.world.objects.push_back(&gol);
-    app.world.activate(app.world.objects[0]);
-
-    // Main loop.
-    if(valgrindTest) {
-        int testCycle = 100;
-        while(testCycle--) {
-            app.update();
-            app.draw();
-        }
-    } else {
-        while (!glfwWindowShouldClose(app.window)) {
-            app.update();
-            app.draw();
-        }
-    }
-
-    usleep(250000);
-
-    // Close OpenGL window and terminate GLFW
-    glfwTerminate();
-
-    app.terminate();
-
-    return 0;
 }

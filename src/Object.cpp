@@ -24,7 +24,7 @@ Object::~Object() {}
  * @param y: Cube y logical coordinate.
  * @param z: Cube z logical coordinate.
  */
-void Object::add(int x, int y, int z) {
+void Object::add(const int x, const int y, const int z) {
     auto center = glm::ivec3(x, y, z);
 
     // If it's not empty, add a Cube from limbo.

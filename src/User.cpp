@@ -352,18 +352,28 @@ void User::handleInput() {
     // Delete the currently-selected region.
     if(io.toggled(GLFW_KEY_Z)) {
         deleteRegion();
-    }
     // Cut the currently-selected region to the clipBoard.
-    if(io.toggled(GLFW_KEY_X)) {
+    } else if(io.toggled(GLFW_KEY_X)) {
         cut();
-    }
     // Copy the currently-selected region to the clipBoard.
-    if(io.toggled(GLFW_KEY_C)) {
+    } else if(io.toggled(GLFW_KEY_C)) {
         copy();
-    }
     // Paste the region in the clipBoard to the activeObj.
-    if(io.toggled(GLFW_KEY_V)) {
+    } else if(io.toggled(GLFW_KEY_V)) {
         paste();
+    }
+
+    // Controls how quickly cube density increases and decreases.
+    const float dCubeP = 0.002f;
+    // Increase Cube cube density.
+    if(io.pressed(GLFW_KEY_PERIOD)) {
+        cubeP = std::min(cubeP + dCubeP, 1.f);
+    // Decrease Cube cube density.
+    } else if(io.pressed(GLFW_KEY_COMMA)) {
+        cubeP = std::max(cubeP - dCubeP, 0.f);
+    // Reset Cube cube density.
+    } else if(io.toggled(GLFW_KEY_SLASH)) {
+        cubeP = 0.1f;
     }
 }
 
@@ -432,7 +442,8 @@ void User::init(World *world_,
 void User::makeCubes() {
     // Only do it in edit mode.
     if(state == edit) {
-        dynamic_cast<CellularAutomaton*>(*activeObj)->cubeCube(cubeHwidth, 0.1, drawCursor);
+        auto obj = dynamic_cast<CellularAutomaton*>(*activeObj);
+        obj->cubeCube(cubeHwidth, cubeP, drawCursor);
     }
 }
 
