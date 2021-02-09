@@ -15,7 +15,7 @@ void Cube::setup(int x_, int y_, int z_, int type_) {
     z = z_;
     center = glm::ivec3(x, y, z);
     state = 0;
-    live_neighbors = 0;
+    liveNeighbors = 0;
     type = type_;
     texBase = typeBase[type];
 

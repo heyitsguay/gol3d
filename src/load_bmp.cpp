@@ -7,7 +7,15 @@
 #include <cstdlib>
 #include <string>
 
-GLuint load_bmp(const char *imagepath) {
+GLuint load_bmp(char **dest, const char *imagePath) {
+    /*
+     * Loads data from a BMP file into a character array
+     *
+     * Inputs:
+     * dest         Pointer to the char array that should hold the BMP output.
+     * imagePath    Name of the image file, relative to the pwd.
+     */
+
     // Data read from the BMP header.
     unsigned char header[54]; // BMP header
     unsigned int dataPos; // Position in the file where the actual data begins.
@@ -16,7 +24,7 @@ GLuint load_bmp(const char *imagepath) {
     unsigned char *data; // Actual RGB data;
 
     // Open the file
-    FILE *file = fopen(imagepath, "rb");
+    FILE *file = fopen(imagePath, "rb");
     if(!file) {
         printf("Image could not be opened.\n");
         return 0;

@@ -41,8 +41,11 @@ void World::draw(float t) {
     // Tracks the number of Cubes to draw.
     drawCount = 0;
 
+    // TODO: Make more extensible
     // Texture to apply to dying cubes.
-    const glm::ivec2 dyingTex = typeBase[T_BORDERDYING];
+    const glm::ivec2 state2Tex = typeBase[T_BORDERDYING];
+    const glm::ivec2 state3Tex = typeBase[T_GRAD];
+    const glm::ivec2 state4Tex = typeBase[T_GRADDYING];
 
     const float camDist2 = cam.drawDistance * cam.drawDistance;
 
@@ -68,7 +71,11 @@ void World::draw(float t) {
                 scales.push_back(obj->scale);
                 // Different texture for dying Cubes.
                 if(c->state == 2) {
-                    types.push_back(dyingTex);
+                    types.push_back(state2Tex);
+                } else if (c->state == 3) {
+                    types.push_back(state3Tex);
+                } else if (c->state == 4) {
+                    types.push_back(state4Tex);
                 } else {
                     types.push_back(c->texBase);
                 }
@@ -209,7 +216,7 @@ void World::initGL() {
     glBindTexture(GL_TEXTURE_2D, atlasTex);
     // Image width and height.
     int width, height;
-    unsigned char *image = SOIL_load_image("../../data/img/cubeatlas.png",
+    unsigned char *image = SOIL_load_image("data/img/cubeatlas.png",
                                            &width,
                                            &height,
                                            0,

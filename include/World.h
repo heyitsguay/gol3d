@@ -12,6 +12,7 @@
 
 #include "Camera.h"
 #include "CellularAutomaton.h"
+#include "GeneralizedCellularAutomaton.h"
 #include "Object.h"
 
 class World {

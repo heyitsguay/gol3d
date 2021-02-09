@@ -28,7 +28,7 @@ class Application {
 private:
     Application();
     Application(Application const&);
-    void operator=(Camera const&);
+    void operator=(Application const&);
 
     // When true, the Application prints performance info.
     bool printPerfInfo = false;
@@ -72,6 +72,13 @@ public:
 
     // Time since initialization.
     double t;
+    // Last frame's start time.
+    double tPrev;
+    // Number of update steps taken.
+    int numSteps;
+
+    // If True, running in headless mode to gather statistics.
+    bool headlessMode;
 
     // The main Cube vertices.
     std::vector<glm::vec3> cubeVertices;
@@ -102,7 +109,14 @@ public:
 
     void draw();
 
-    void init(int monitorID=0, int quality=QUALITY_HIGH, int aaSamples=2);
+    int getActiveCubes();
+
+    void init(
+            int monitorID,
+            int quality,
+            int aaSamples,
+            bool headlessMode_,
+            std::vector<float> *cubeCubeProbs);
 
     void terminate();
 

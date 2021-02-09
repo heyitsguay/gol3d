@@ -3,10 +3,16 @@
 //
 #include "Application.h"
 
+#if defined(POSIX)
 #include <GL/glxew.h>
+#elif defined(_WIN32)
+#include <GL/wglew.h>
+#endif
 
 #include "load_obj.h"
 #include "opengl-debug.h"
+
+const double frameRate = 1./60;
 
 Application::Application() :
         io(IO::getInstance()),
@@ -46,6 +52,12 @@ void Application::freeGL() {
     glDeleteVertexArrays(1, &cubeVAO);
 }
 
+
+int Application::getActiveCubes() {
+    return (int)world.activeObject->activeCubes.size();
+}
+
+
 /**
  * Application.handleInput()
  * Handle user input to the Application.
@@ -69,7 +81,12 @@ void Application::handleInput() {
  * @param quality: Indicates the graphics quality.
  * @param aaSamples: Number of samples to use for multisampling (antialiasing).
  */
-void Application::init(int monitorID, int quality, int aaSamples) {
+void Application::init(
+        int monitorID,
+        int quality,
+        int aaSamples,
+        bool headlessMode_,
+        std::vector<float> *cubeCubeProbs) {
     // Initialize OpenGL resources.
     initGL(monitorID, quality, aaSamples);
 
@@ -82,11 +99,13 @@ void Application::init(int monitorID, int quality, int aaSamples) {
     // Camera setup.
     cam.init();
 
+    headlessMode = headlessMode_;
+
     // User setup.
     glm::vec3 position0(0, 0, 80);
-    float horizontalAngle0 = (float)PI;
+    auto horizontalAngle0 = (float)PI;
     float verticalAngle0 = 0.f;
-    user.init(&world, &cursorSP, position0, horizontalAngle0, verticalAngle0);
+    user.init(&world, &cursorSP, position0, horizontalAngle0, verticalAngle0, cubeCubeProbs);
 
     // Skybox setup.
     const float skyscale = 10000.f;
@@ -94,7 +113,9 @@ void Application::init(int monitorID, int quality, int aaSamples) {
     skybox.init(&skyboxSP, &cam, skyscale, useHD);
 
     // Get the time.
+    tPrev = glfwGetTime();
     t = glfwGetTime();
+    numSteps = 0;
 }
 
 /**
@@ -156,8 +177,8 @@ void Application::initGL(int monitorID, int quality, int aaSamples) {
     }
 
     // Create the GLFW window, make its context current.
-    window = glfwCreateWindow(window_width, window_height, " ", useMonitor, NULL);
-    if( window == NULL ) {
+    window = glfwCreateWindow(window_width, window_height, " ", useMonitor, nullptr);
+    if( window == nullptr ) {
         printf("Failed to open GLFW window");
         glfwTerminate();
         abort();
@@ -176,22 +197,23 @@ void Application::initGL(int monitorID, int quality, int aaSamples) {
     GL_CHECK( true );
 
     // Disable the cursor.
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+//    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    // Set up vsync if available.
-    if(GLXEW_EXT_swap_control) {
-        Display *dpy = glXGetCurrentDisplay();
-        GLXDrawable drawable = glXGetCurrentDrawable();
-        if (drawable) {
-            glXSwapIntervalEXT(dpy, drawable, 1);
-        }
-    }
+    // Set up vsync
+    glfwSwapInterval(1);
+//    if(GLXEW_EXT_swap_control) {
+//        Display *dpy = glXGetCurrentDisplay();
+//        GLXDrawable drawable = glXGetCurrentDrawable();
+//        if (drawable) {
+//            glXSwapIntervalEXT(dpy, drawable, 1);
+//        }
+//    }
 
     // Set initial clear color to black.
     glClearColor(0.f, 0.f, 0.f, 1.f);
 
     // Read in the cube.obj file.
-    auto *path = (char*)"../../data/obj/cubeuv2.obj";
+    auto *path = (char*)"data/obj/cubeuv2.obj";
     if(!load_textured_obj(path, cubeVertices, cubeNormals, cubeUVs)) {
         printf("Could not load %s\n", path);
         abort();
@@ -256,9 +278,9 @@ void Application::initGL(int monitorID, int quality, int aaSamples) {
     glEnableVertexAttribArray(5);
 
     // Load shaders.
-    worldSP = LoadShaders("../../src/glsl/world.vert", "../../src/glsl/world.frag");
-    cursorSP = LoadShaders("../../src/glsl/cursor.vert", "../../src/glsl/cursor.frag");
-    skyboxSP = LoadShaders("../../src/glsl/skybox.vert", "../../src/glsl/skybox.frag");
+    worldSP = LoadShaders("glsl/world.vert", "glsl/world.frag");
+    cursorSP = LoadShaders("glsl/cursor.vert", "glsl/cursor.frag");
+    skyboxSP = LoadShaders("glsl/skybox.vert", "glsl/skybox.frag");
 
     // Set the alpha blend function.
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -266,12 +288,12 @@ void Application::initGL(int monitorID, int quality, int aaSamples) {
 
     // Set the depth test function.
     glDepthFunc(GL_LEQUAL);
+
 }
 
 /**
  * Application.perfInfo()
  * Calculates performance info (framerate, number of Cubes, etc.)
- * @param display: If true, prints the performance info.
  */
 void Application::perfInfo() {
     static double lastTime = 0;
@@ -309,14 +331,19 @@ void Application::terminate() {
  */
 void Application::update() {
     // Update the time variable.
+//    double tNew = glfwGetTime();
     t = glfwGetTime();
+    numSteps += 1;
 
     // Handle user input.
     handleInput();
 
     user.update(t);
 
-    world.update();
+    if (t - tPrev > 0){//frameRate) {
+        world.update();
+        tPrev = glfwGetTime();
+    }
 
     cam.update();
 

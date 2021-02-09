@@ -21,6 +21,7 @@ enum ObjectState {stop, step, run};
 
 typedef std::unordered_map<glm::ivec3, Cube*, KeyFuncs, KeyFuncs> cubeMap_t;
 typedef std::unordered_map<glm::ivec3, bool, KeyFuncs, KeyFuncs> boolMap_t;
+typedef std::unordered_map<glm::ivec3, int, KeyFuncs, KeyFuncs> intMap_t;
 
 class Object {
 protected:

@@ -25,7 +25,7 @@ public:
     int state;
     
     // Number of live neighbors.
-    char live_neighbors;
+    char liveNeighbors;
 
     // Type (determines texture).
     int type;

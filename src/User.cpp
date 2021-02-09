@@ -85,7 +85,7 @@ void User::copy() {
                     center.z = z;
                     // Save any non-dead Cubes, in region-relative coordinates.
                     if (obj->findIn(obj->drawCubes, center)) {
-                        clipBoard.insert({center - currentRegion[0], obj->activeCubes[center]->state == 2});
+                        clipBoard.insert({center - currentRegion[0], obj->activeCubes[center]->state});
                     }
                 }
             }
@@ -109,7 +109,7 @@ void User::cut() {
 void User::deleteRegion() {
     if(state == selection) {
         // The current object.
-        auto obj = dynamic_cast<CellularAutomaton *>(*activeObj);
+        auto obj = dynamic_cast<GeneralizedCellularAutomaton *>(*activeObj);
 
         // Get the bounds of the current region.
         computeRegionBounds();
@@ -384,17 +384,20 @@ void User::handleInput() {
  * @param position_: User initial position.
  * @param horizontalAngle_: User initial heading horizontal angle.
  * @param verticalAngle_: User initial heading vertical angle.
+ * @param cubeCubeProbs_: Cube Cube generation probability distribution.
  */
 void User::init(World *world_,
                 GLuint *programCursor_,
                 glm::vec3 position_,
                 float horizontalAngle_,
-                float verticalAngle_) {
+                float verticalAngle_,
+                std::vector<float> *cubeCubeProbs_) {
     world = world_;
     programCursor = programCursor_;
     position = position_;
     horizontalAngle = horizontalAngle_;
     verticalAngle = verticalAngle_;
+    cubeCubeProbs = cubeCubeProbs_;
     // Set the reset state.
     position0 = position;
     horizontalAngle0 = horizontalAngle;
@@ -442,8 +445,9 @@ void User::init(World *world_,
 void User::makeCubes() {
     // Only do it in edit mode.
     if(state == edit) {
-        auto obj = dynamic_cast<CellularAutomaton*>(*activeObj);
-        obj->cubeCube(cubeHwidth, cubeP, drawCursor);
+        auto obj = dynamic_cast<GeneralizedCellularAutomaton*>(*activeObj);
+//        obj->cubeCube(cubeHwidth, {0.05f, 0, 0.05f, 0}, drawCursor);
+        obj->cubeCube(cubeHwidth, *cubeCubeProbs, drawCursor);
     }
 }
 
@@ -453,12 +457,12 @@ void User::makeCubes() {
  * drawCursor.
  */
 void User::paste() {
-    if(clipBoard.size() > 0) {
-        auto obj = dynamic_cast<CellularAutomaton*>(*activeObj);
+    if(!clipBoard.empty()) {
+        auto obj = dynamic_cast<GeneralizedCellularAutomaton*>(*activeObj);
 
-        for(auto it = clipBoard.begin(); it != clipBoard.end(); ++it) {
-            glm::ivec3 center = drawCursor + it->first;
-            int cubeState = 1 + static_cast<int>(it->second);
+        for(auto & it : clipBoard) {
+            glm::ivec3 center = drawCursor + it.first;
+            int cubeState = it.second;
             obj->add(center.x, center.y, center.z);
             obj->setCube(obj->activeCubes[center], cubeState);
         }
@@ -511,7 +515,7 @@ void User::update(double t) {
  */
 void User::updateEdit() {
     // Object we're drawing. Assume it's a CellularAutomaton for now. TODO: make this better.
-    CellularAutomaton* obj = dynamic_cast<CellularAutomaton*>(*activeObj);
+    GeneralizedCellularAutomaton* obj = dynamic_cast<GeneralizedCellularAutomaton*>(*activeObj);
 
     // Base cursor location will be the Cube containing this point.
     glm::vec3 base = position + baseDrawDist * heading;
@@ -633,4 +637,5 @@ void User::updateSelect() {
     // Update region info.
     regionCenter = glm::vec3(currentRegion[0] + currentRegion[1]) / 2.f;
     regionScale = glm::abs(glm::vec3(currentRegion[0] - currentRegion[1])) + glm::vec3(1., 1., 1.);
+    dRegion = glm::vec3(currentRegion[1] - currentRegion[0]);
 }

@@ -11,6 +11,7 @@
 
 #include "Camera.h"
 #include "CellularAutomaton.h"
+#include "GeneralizedCellularAutomaton.h"
 #include "World.h"
 
 #include "global.h"
@@ -33,8 +34,9 @@ private:
     // Max linear speed.
     const float max_speed = 80.f;
 
-    // Rotational speed.
+    // Rotational speed, per frame.
     const float rotation_speed = 0.03;
+
 
     // Number of frames to take when resetting the User's position.
     const int num_reset_frames = 60;
@@ -78,6 +80,8 @@ private:
     int cubeHwidth;
     // Cube cube density (activation probability).
     float cubeP = 0.1f;
+    // Cube cube probability distribution
+    std::vector<float> *cubeCubeProbs;
 
 
     // Draw cursor offset from heading basepoint.
@@ -103,6 +107,10 @@ private:
 
 
     void computeRegionBounds();
+
+    void reflectRegion(int axis);
+
+    void rotateRegion(bool clockwise);
 
 public:
     // User state.
@@ -154,9 +162,8 @@ public:
     int numSetSelections;
     // Clipboard for a region of Cubes to cut/copy/paste. Keys use
     // coordinates relative to a bottom-left front corner of (0,0,0).
-    // A value of 'false' indicates a dying Cube, 'true' indicates a
-    // live Cube.
-    boolMap_t clipBoard;
+    // Stores any non-dead cube states
+    intMap_t clipBoard;
     
     User();
 
@@ -178,7 +185,8 @@ public:
               GLuint *programCursor_,
               glm::vec3 position_,
               float horizontalAngle_,
-              float verticalAngle_);
+              float verticalAngle_,
+              std::vector<float> *cubeCubeProbs_);
 
     void makeCubes();
 

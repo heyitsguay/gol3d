@@ -21,7 +21,10 @@ CellularAutomaton::~CellularAutomaton() {
  * @param p: Cube activation probability.
  * @param center: Center of the cube of Cubes.
  */
-void CellularAutomaton::cubeCube(int hwidth, float p, glm::ivec3 center) {
+void CellularAutomaton::cubeCube(
+        int hwidth,
+        float p,
+        glm::ivec3 center) {
     // Obtain a seed from the system clock:
     auto seed = static_cast<unsigned int>(std::chrono::system_clock::now().time_since_epoch().count());
 
@@ -282,10 +285,10 @@ void CellularAutomaton::updateNeighborCount() {
                             int Z = c->z + dz;
 
                             // Check if the neighbor exists in activeCubes. Increment
-                            // its live_neighbors if it does.
+                            // its liveNeighbors if it does.
                             auto key = glm::ivec3(X, Y, Z);
                             if(findIn(activeCubes, key)) {
-                                activeCubes[key]->live_neighbors++;
+                                activeCubes[key]->liveNeighbors++;
                             }
                         }
 
@@ -299,13 +302,13 @@ void CellularAutomaton::updateNeighborCount() {
 
 /**
  * CellularAutomaton.updateResetCount()
- * Resets the live_neighbors property to 0 for all Cubes in activeCubes.
+ * Resets the liveNeighbors property to 0 for all Cubes in activeCubes.
  */
 void CellularAutomaton::updateResetCount() {
     for(auto it = activeCubes.begin(); it != activeCubes.end(); ++it) {
         Cube *c = it->second;
 
-        c->live_neighbors = 0;
+        c->liveNeighbors = 0;
     }
 
     cycleStage++;
@@ -316,12 +319,12 @@ void CellularAutomaton::updateResetCount() {
  * Updates the state of each Cube in activeCubes.
  */
 void CellularAutomaton::updateState() {
-    for(auto iter = activeCubes.begin(); iter != activeCubes.end(); ++iter) {
-        Cube *c = iter->second;
+    for(auto & activeCube : activeCubes) {
+        Cube *c = activeCube.second;
 
         if(c->state == 0) {
             // Check if a dead Cube should become live.
-            if(born[c->live_neighbors]) {
+            if(born[c->liveNeighbors]) {
                 flip(c);
 
             } else {
@@ -333,8 +336,8 @@ void CellularAutomaton::updateState() {
         else if(c->state == 1) {
             // Check if a live Cube should stay.
 
-            // Toggle state if live_neighbors isn't a valid stay[] value.
-            if(!stay[c->live_neighbors]) {
+            // Toggle state if liveNeighbors isn't a valid stay[] value.
+            if(!stay[c->liveNeighbors]) {
                 flip(c);
 
             }

@@ -1,0 +1,49 @@
+         W   rotate view up
+         S   rotate view down
+         A   rotate view left
+         D   rotate view right
+
+        Up   move forward
+      Down   move backward
+      Left   strafe left
+     Right   strafe right
+  Shift+Up   move up
+Shift+Down   move down
+         T   reset user position
+
+         F   toggle edit mode
+ Left-Ctrl   enter select mode, if in edit mode
+     Space   draw (edit mode) or add selection point (select mode)
+
+         Z   delete the currently-selected region
+         X   cut the currently-selected region
+         C   copy the currently-selected region
+         V   paste the currently-selected region
+
+         I   shift cursor up
+         K   shift cursor down
+         J   shift cursor left
+         L   shift cursor right
+   Shift+I   shift cursor forward
+   Shift+K   shift cursor down
+         P   reset cursor offset
+
+         Q   create a Cube cube
+         [   decrease Cube cube radius
+         ]   increase Cube cube radius
+         .   increase Cube cube density
+         ,   decrease Cube cube density
+         /   reset Cube cube density
+
+         1   stop simulation
+         3   run simulation
+         e   step simulation forward
+         r   reset simulation
+       Esc   quit program
+
+         b   toggle performance info display
+         g   toggle skybox drawing
+
+         =   increase Cube base hue
+         -   decrease Cube base hue
+         n   toggle Cube flat shading

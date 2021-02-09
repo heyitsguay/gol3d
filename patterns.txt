@@ -16,4 +16,6 @@ Brian's Brain
  *B4,9/S5,12: Similar to B4,9/S5,10/T, but less unstable so far.
 **B4,10/S1,9: explosive rakes, glider guns that create expanding diamonds. 
 **B4,10/S5,12: Crazy puffers and rakes and gliders guns and more.
+  B4,11/S5,12: Similar to B4,10/S5,12, maybe a little less dynamic
+  B4,12/S5,12: Similar to B4,10/S5,12
  *B4/S1,9: Several interesting puffers.

@@ -1,0 +1,4 @@
+/home/matt/clion/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Release -G "CodeBlocks - Unix Makefiles" /home/matt/Dropbox/git/gol3d
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/matt/Dropbox/git/gol3d/cmake-build-release
