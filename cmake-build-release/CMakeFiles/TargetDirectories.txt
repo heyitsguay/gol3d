@@ -1,3 +1,0 @@
-/home/matt/Dropbox/git/gol3d/cmake-build-release/CMakeFiles/rebuild_cache.dir
-/home/matt/Dropbox/git/gol3d/cmake-build-release/CMakeFiles/edit_cache.dir
-/home/matt/Dropbox/git/gol3d/cmake-build-release/CMakeFiles/gol3d.dir
