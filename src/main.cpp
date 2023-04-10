@@ -24,7 +24,7 @@
 
 #define USEGENERALIZED
 
-bool headlessMode = false;
+bool headlessMode = true;
 std::vector<int> activeCubeLog;
 int activeCubesInit = 0;
 int activeCubesNow = 0;
