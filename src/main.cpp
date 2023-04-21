@@ -24,7 +24,7 @@
 
 #define USEGENERALIZED
 
-bool headlessMode = true;
+bool headlessMode = false;
 std::vector<int> activeCubeLog;
 int activeCubesInit = 0;
 int activeCubesNow = 0;
@@ -42,19 +42,23 @@ std::vector<std::vector<std::string>> defaultRules =
 //        {"-", "6,7,8,9,10,11", "C", "-", "-"},
 //        {"A", "-", "-", "-", "-"},
 //        {"-", "-", "-", "5,8", "C"},
-//        {"A", "-", "-", "-", "-"}
+//        {"A", "-", "-", "-", "-"}`
 //};
 //        {{"C", "8,10", "-"}, {"-", "4,5,6,7,8,9", "C"}, {"A", "-", "-"}};
 //        {{"C", "6", "5"}, {"C", "8", "9,13"}, {"C", "-", "9"}};
 //        {{"C", "4,10", "-"}, {"-", "5,12", "C"}, {"A", "-", "-"}};
 //        {{"C", "8,9"}, {"C", "6,7,8,9"}};
-        {{"C", "4", "-", "-", "-"}, {"-", "6,7,8,9,10", "C", "-", "-"}, {"-", "-", "-", "A", "-"}, {"-", "7,8", "3,4,5,6", "-", "C"}, {"A", "-", "-", "-", "-"}};
-std::set<int> defaultLiveStates = {1};
+//        {{"C", "4", "-", "-", "6"}, {"-", "6,7,8,9,10", "C", "-", "-"}, {"-", "-", "-", "A", "-"}, {"-", "7,8", "3,4,5,6", "-", "C"}, {"A", "-", "-", "-", "-"}};
+//        {{"C", "10", "-", "14", "-"}, {"-", "6,7,8,9,10", "C", "-", "-"}, {"-", "-", "-", "A", "-"}, {"-", "7,8", "3,4,5,6", "-", "C"}, {"A", "-", "-", "-", "-"}};
+//        {{"C", "4", "5,6", "2,3", "-"}, {"1", "3,4,8", "5,6", "7,14", "C"}, {"1", "4,6,9", "8,10", "C", "5,16"}, {"-", "-", "-", "3,4,5,6", "C"}, {"C", "-", "-", "4,6", "12"}};
+        {{"C", "4", "5,6", "2,3,7", "8,9"}, {"1", "3,4,8", "5,9,13", "7,14", "C"}, {"1", "4,6,9", "8,10", "C", "5,16"}, {"-", "-", "-", "4,5,6,7,8", "C"}, {"C", "-", "-", "4,6", "12"}};
+
+std::set<int> defaultLiveStates = {1, 2};
 //std::vector<float> defaultCubeCubeProbs = {0.05f, 0, 0.05f, 0};
 std::vector<float> defaultCubeCubeProbs = {0.15f};
 
 // Half-width of one side of the initial cube of Cubes.
-int hwidth = 17;
+int hwidth = 25;
 
 const int updatesPerFrame = 1000;
 
@@ -81,6 +85,23 @@ int main(int argc, char **argv) {
     std::vector<int> born, stay;
     bool useBB;
 
+    std::stringstream ruleStringStream;
+    for(int i = 0; i < defaultRules.size(); i++) {
+        auto line = defaultRules[i];
+        for (int j = 0; j < line.size(); j++) {
+            auto c = line[j];
+            ruleStringStream << c;
+            if (j < line.size() - 1) {
+                ruleStringStream << '+';
+            }
+        }
+        if (i < defaultRules.size() - 1) {
+            ruleStringStream << '_';
+        }
+    }
+    std::string ruleString = ruleStringStream.str();
+    std::cout << ruleString;
+
     // Use inputs to put the application into test mode for valgrind.
     bool valgrindTest;
 
@@ -89,7 +110,7 @@ int main(int argc, char **argv) {
     // Create and initialize the Application.
     Application &app = Application::getInstance();
 //    app.init(1, QUALITY_LAPTOP);
-    app.init(0, QUALITY_HIGH, 2, headlessMode, &defaultCubeCubeProbs);
+    app.init(1, QUALITY_HIGH, 2, headlessMode, &defaultCubeCubeProbs);
 
     // GOL3D setup.
 #ifdef USEGENERALIZED
@@ -125,50 +146,61 @@ int main(int argc, char **argv) {
             app.draw();
         }
     } else {
-        while (!glfwWindowShouldClose(app.window)) {
+        bool close_condition = app.headlessMode ? app.numSteps > 100 : glfwWindowShouldClose(app.window);
+        while (!close_condition) {
+            close_condition = app.headlessMode ? app.numSteps > 100 : glfwWindowShouldClose(app.window);
             app.update();
             if (!app.headlessMode) {
                 app.draw();
+            }
+            int numActiveCubes = app.getActiveCubes();
+            activeCubeLog.push_back(numActiveCubes);
+            if (activeCubesInit == 0) {
+                activeCubesInit = numActiveCubes;
+                activeCubesNow = numActiveCubes;
+                activeCubesNowSmooth = numActiveCubes;
             } else {
-                int numActiveCubes = app.getActiveCubes();
-                activeCubeLog.push_back(numActiveCubes);
-                if (activeCubesInit == 0) {
-                    activeCubesInit = numActiveCubes;
-                    activeCubesNow = numActiveCubes;
-                    activeCubesNowSmooth = numActiveCubes;
-                } else {
-                    activeCubesNow = numActiveCubes;
-                    activeCubesNowSmooth =
-                            0.5f * activeCubesNowSmooth + 0.5f * numActiveCubes;
-                }
+                activeCubesNow = numActiveCubes;
+                activeCubesNowSmooth =
+                        0.5f * activeCubesNowSmooth + 0.5f * numActiveCubes;
+            }
 
-                if (activeCubesNowSmooth / activeCubesInit > 3) {
-                    std::stringstream reportStringStream;
-                    reportStringStream << gol.ruleString << ": Blowup in "
-                        << app.numSteps << " steps.";
-                    std::string reportString = reportStringStream.str();
-                    std::cout << reportString << std::endl;
+            if (activeCubesNowSmooth / activeCubesInit > 22) {
+                std::stringstream reportStringStream;
+                reportStringStream << gol.ruleString << ": Blowup in "
+                    << app.numSteps << " steps.";
+                std::string reportString = reportStringStream.str();
+//                std::cout << reportString << std::endl;
 
-                    std::ofstream reportFile;
-                    reportFile.open("report.txt", std::ofstream::out | std::ofstream::app);
-                    reportFile << reportString << "\n";
-                    reportFile.close();
+                std::ofstream reportFile;
+                reportFile.open("report.txt", std::ofstream::out | std::ofstream::app);
+                reportFile << reportString << "\n";
+                reportFile.close();
 
-                    // Sleep for a quarter second to stop some bug that was happening with GLFW destruction
-                    ThreadSleep(250 * 1000);
+                // Sleep for a quarter second to stop some bug that was happening with GLFW destruction
+                ThreadSleep(250 * 1000);
 
-                    // Close OpenGL window and terminate GLFW
-                    glfwTerminate();
+                // Close OpenGL window and terminate GLFW
+                glfwTerminate();
 
-                    app.terminate();
+                app.terminate();
 
-                    return 0;
-
-                }
+                return 0;
 
             }
 
         }
+        // Final report
+        std::ofstream finalReportFile;
+        finalReportFile.open("report.txt", std::ofstream::out | std::ofstream::app);
+
+        finalReportFile << gol.ruleString << "\n";
+        for (int i : activeCubeLog) {
+//            std::cout << std::to_string(i) << std::endl;
+            finalReportFile << std::to_string(i) << ",";
+        }
+        finalReportFile << "\n";
+        finalReportFile.close();
     }
 
     // Sleep for a quarter second to stop some bug that was happening with GLFW destruction

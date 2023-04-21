@@ -3,6 +3,8 @@
 //
 #include "Application.h"
 
+#include <iostream>
+
 #if defined(POSIX)
 #include <GL/glxew.h>
 #elif defined(_WIN32)
@@ -27,7 +29,7 @@ void Application::draw() {
 
     world.draw((float)t);
 
-    skybox.draw();
+    skybox.draw(getActiveCubes());
 
     user.draw();
 
@@ -87,6 +89,8 @@ void Application::init(
         int aaSamples,
         bool headlessMode_,
         std::vector<float> *cubeCubeProbs) {
+    headlessMode = headlessMode_;
+
     // Initialize OpenGL resources.
     initGL(monitorID, quality, aaSamples);
 
@@ -98,8 +102,6 @@ void Application::init(
 
     // Camera setup.
     cam.init();
-
-    headlessMode = headlessMode_;
 
     // User setup.
     glm::vec3 position0(0, 0, 80);

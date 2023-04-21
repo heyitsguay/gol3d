@@ -65,7 +65,7 @@ public:
               float scale_=10000.f,
               bool useHD = true);
 
-    void draw();
+    void draw(int activeCubes);
 
 };
 
