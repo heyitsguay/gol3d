@@ -10,6 +10,8 @@ from typing import Literal
 
 import tqdm
 
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 
 StateType = Literal["dead", "live", "dying"]
 
@@ -223,7 +225,7 @@ if __name__ == "__main__":
         rng = random.Random(args.seed)
 
         today = time.strftime('%Y-%m-%d')
-        rules_dir = f'../output/rules/{today}'
+        rules_dir = f'{ROOT_DIR}/output/rules/{today}'
         os.makedirs(rules_dir, exist_ok=True)
         n_rules = len([f for f in os.listdir(rules_dir) if f.endswith('.json')])
         save_file = f'{rules_dir}/{n_rules:03}.json'
