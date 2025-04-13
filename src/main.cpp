@@ -96,6 +96,8 @@ void saveStateData(const std::string& ruleString,
     // Add endStatus
     outputJson["endStatus"] = endStatus;
 
+    outputJson["maxSteps"] = 3000;
+
     // Add liveStates (convert set to array)
     outputJson["liveStates"] = json::array();
     for (const auto& state : defaultLiveStates) {

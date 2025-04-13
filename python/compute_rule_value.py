@@ -12,9 +12,10 @@ class CAValueFunction:
 
     def __init__(self,
                  transient_ratio=0.3,
-                 growth_weight=0.4,
-                 periodicity_weight=0.4,
-                 complexity_weight=0.2,
+                 early_termination_weight=0.5,
+                 growth_weight=0.2,
+                 periodicity_weight=0.2,
+                 complexity_weight=0.1,
                  ideal_growth_exp=1.0):
         """
         Initialize the value function with customizable weights
@@ -23,6 +24,8 @@ class CAValueFunction:
         -----------
         transient_ratio : float
             Fraction of the time series to discard as initial transient (0.0 - 1.0)
+        early_termination_weight : float
+            Weight for early termination loss term
         growth_weight : float
             Weight for growth rate loss term
         periodicity_weight : float
@@ -33,6 +36,7 @@ class CAValueFunction:
             Ideal growth exponent (0=constant, 1=linear, 2=quadratic)
         """
         self.transient_ratio = transient_ratio
+        self.early_termination_weight = early_termination_weight
         self.growth_weight = growth_weight
         self.periodicity_weight = periodicity_weight
         self.complexity_weight = complexity_weight
@@ -57,13 +61,18 @@ class CAValueFunction:
         # Check for early termination conditions
         end_status = simulation_dict.get("endStatus", None)
         if end_status in ["explosion", "extinction", "flatline"]:
-            return 0.0, {
+            early_termination_loss = self._early_termination_loss(simulation_dict)
+            loss = self.early_termination_weight * early_termination_loss \
+                   + self.growth_weight + self.periodicity_weight + self.complexity_weight
+            value = -loss
+            return value, {
                 "reason": f"Early termination: {end_status}",
+                "early_termination_loss": early_termination_loss,
                 "growth_loss": 1.0,
                 "periodicity_loss": 1.0,
                 "complexity_loss": 1.0,
-                "total_loss": 1.0,
-                "value": 0.0
+                "total_loss": loss,
+                "value": value,
             }
 
         # Extract population time series
@@ -94,10 +103,7 @@ class CAValueFunction:
         )
 
         # Convert loss to value (higher is better)
-        v = 1.0 - total_loss
-
-        # Ensure value is in [0, 1] range
-        v = np.clip(v, 0, 1)
+        v = -total_loss
 
         # Return value and detailed breakdown
         return v, {
@@ -107,6 +113,17 @@ class CAValueFunction:
             "total_loss": total_loss,
             "value": v
         }
+
+    @staticmethod
+    def _early_termination_loss(simulation_json):
+        max_steps = simulation_json.get("maxSteps", 3000)
+
+        population_record = simulation_json.get("populationRecord", {})
+
+        time_steps = sorted([int(k) for k in population_record.keys()])
+        max_observed_step = max(time_steps)
+        observed_fraction = max_observed_step / max_steps
+        return (1 / (0.1 + observed_fraction))**2
 
     @staticmethod
     def _extract_population(simulation_json):
@@ -166,8 +183,7 @@ class CAValueFunction:
             log_pop = np.log(pop_safe)
 
             # Calculate slope (exponent b)
-            slope = np.polyfit(log_time, log_pop, 1)
-            print(f'Slope is: {slope}')
+            slope, coeff = np.polyfit(log_time, log_pop, 1)
 
             # Convert to power law parameters
             exponent = slope
@@ -306,9 +322,8 @@ if __name__ == "__main__":
 
     # Evaluate with default parameters
     value, details = evaluate_ca_rule(example_json)
-    print(f'Got these returned:\n{value}\n{details}\n-------------')
 
-    print(f"Rule value: {value:.4f}")
+    print(f"Rule value: {value:.f}")
     print("Breakdown:")
     for key, val in details.items():
         print(f"  {key}: {val}")
