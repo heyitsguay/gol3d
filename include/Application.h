@@ -109,7 +109,10 @@ public:
 
     void draw();
 
-    int getActiveCubes();
+    int getActiveCubes() const;
+
+    std::vector<int> getCubeStateCounts() const;
+    std::string getRuleString() const;
 
     void init(
             int monitorID,

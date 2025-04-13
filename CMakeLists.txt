@@ -11,8 +11,8 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 #    list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/windows")
 #endif(WIN32)
 
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -std=c++17 -O3 -funroll-loops -ffinite-math-only -ffast-math")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -std=c++17")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -std=c++20 -O3 -funroll-loops -ffinite-math-only -ffast-math")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -std=c++20")
 
 set(SOURCE_FILES
         src/main.cpp
@@ -28,7 +28,8 @@ set(SOURCE_FILES
         src/CellularAutomaton.cpp
         src/GeneralizedCellularAutomaton.cpp
         src/World.cpp
-        src/utils.cpp)
+        src/utils.cpp
+        src/Rule.cpp)
 add_executable(gol3d ${SOURCE_FILES})
 
 find_package(OpenGL REQUIRED)
@@ -39,6 +40,7 @@ pkg_search_module(GLFW REQUIRED glfw3)
 
 include_directories(
         ${CMAKE_SOURCE_DIR}/include
+        ${CMAKE_SOURCE_DIR}/include/nlohmann
         ${GLEW_INCLUDE_DIRS}
         ${OpenGL_INCLUDE_DIRS}
         ${GLFW_INCLUDE_DIRS}

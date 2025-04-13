@@ -55,8 +55,20 @@ void Application::freeGL() {
 }
 
 
-int Application::getActiveCubes() {
+int Application::getActiveCubes() const {
     return (int)world.activeObject->activeCubes.size();
+}
+
+
+std::vector<int> Application::getCubeStateCounts() const {
+    auto gca = dynamic_cast<GeneralizedCellularAutomaton*>(world.activeObject);
+    return gca->stateCounts;
+}
+
+
+std::string Application::getRuleString() const {
+    auto gca = dynamic_cast<GeneralizedCellularAutomaton*>(world.activeObject);
+    return gca->ruleString;
 }
 
 
@@ -335,7 +347,7 @@ void Application::update() {
     // Update the time variable.
 //    double tNew = glfwGetTime();
     t = glfwGetTime();
-    numSteps += 1;
+    numSteps++;
 
     // Handle user input.
     handleInput();

@@ -66,6 +66,8 @@ void GeneralizedCellularAutomaton::cubeCube(
             }
         }
     }
+
+    recomputeStateCounts();
 }
 
 /**
@@ -97,7 +99,6 @@ void GeneralizedCellularAutomaton::handleInput() {
         }
     }
 }
-
 
 /**
  * GeneralizedCellularAutomaton.parseRuleRow()
@@ -187,6 +188,28 @@ std::vector<int> GeneralizedCellularAutomaton::parseRuleRow(
 
 
 /**
+ * GeneralizedCellularAutomaton.recomputeStateCounts()
+ * Get the counts of non-dead Cubes in each state.
+ * This statistic is computed automatically in `updateState()` while
+ * iterating through active Cubes, but sometimes it might be helpful
+ * at other times
+ */
+void GeneralizedCellularAutomaton::recomputeStateCounts() {
+    // Reset state counts for record keeping
+    std::fill(stateCounts.begin(), stateCounts.end(), 0);
+
+    // Iterate through Cubes and update their states
+    for (auto &activeCube : activeCubes) {
+        Cube *c = activeCube.second;
+        int state = c->state;
+
+        // Increment state count information
+        stateCounts[state]++;
+    }
+}
+
+
+/**
  * GeneralizedCellularAutomaton.setCube()
  * Sets Cube *c's state to (state).
  * @param c: Pointer to the Cube whose state is being set.
@@ -259,7 +282,8 @@ void GeneralizedCellularAutomaton::setRule(
     for (auto &row : ruleMatrixExt) {
         ruleMatrixInt.push_back(parseRuleRow(row));
     }
-    numStates = ruleMatrixExt.size();
+    numStates = (int)ruleMatrixExt.size();
+    stateCounts = std::vector<int>(numStates, 0);
 
     std::stringstream ruleStringStream;
     ruleStringStream << "{";
@@ -284,20 +308,20 @@ void GeneralizedCellularAutomaton::setRule(
     ruleString = ruleStringStream.str();
 
 
-    std::ofstream debugFile;
-    debugFile.open("stateDebug.txt");
-    for (int i = 0; i < 27; i++) {
-        debugFile << i << " ";
-        if (i < 10) debugFile << " ";
-    }
-    debugFile << "\n\n";
-    for (auto & row : ruleMatrixInt) {
-        for (auto & col : row) {
-            debugFile << col << "  ";
-        }
-        debugFile << "\n";
-    }
-    debugFile.close();
+//    std::ofstream debugFile;
+//    debugFile.open("stateDebug.txt");
+//    for (int i = 0; i < 27; i++) {
+//        debugFile << i << " ";
+//        if (i < 10) debugFile << " ";
+//    }
+//    debugFile << "\n\n";
+//    for (auto & row : ruleMatrixInt) {
+//        for (auto & col : row) {
+//            debugFile << col << "  ";
+//        }
+//        debugFile << "\n";
+//    }
+//    debugFile.close();
 }
 
 
@@ -422,6 +446,10 @@ void GeneralizedCellularAutomaton::updateResetCount() {
  * Updates the state of each Cube in activeCubes.
  */
 void GeneralizedCellularAutomaton::updateState() {
+    // Reset state counts for record keeping
+    std::fill(stateCounts.begin(), stateCounts.end(), 0);
+
+    // Iterate through Cubes and update their states
     for (auto &activeCube : activeCubes) {
         Cube *c = activeCube.second;
         int oldState = c->state;
@@ -431,6 +459,7 @@ void GeneralizedCellularAutomaton::updateState() {
         } else if (oldState == 0) {
             removeCubes.push_back(c->center);
         }
+        stateCounts[newState]++;
     }
     cycleStage++;
 }

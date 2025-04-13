@@ -42,7 +42,7 @@ public:
     std::vector<glm::ivec2> types;
 
     // Base Cube hue.
-    float baseCubeH = 0.7f;
+    float baseCubeH = 0.5f;
 
     // Determines whether to use flat shading or not.
     float varyColor = 0.5f;
