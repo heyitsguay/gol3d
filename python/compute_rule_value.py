@@ -126,7 +126,7 @@ class CAValueFunction:
 
         time_steps = sorted([int(k) for k in population_record.keys()])
         max_observed_step = max(time_steps)
-        observed_fraction = np.clip(max_observed_step / max_steps, 0.1, 1)
+        observed_fraction = np.clip(max_observed_step / max_steps, 0.05, 1)
         # Set offset so that loss goes to 0 as observed_fraction goes to 1
         offset = 1
         return ((1 / observed_fraction)**2 - offset)**0.5
