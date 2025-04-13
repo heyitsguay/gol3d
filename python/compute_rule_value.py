@@ -305,6 +305,7 @@ if __name__ == "__main__":
 
     # Evaluate with default parameters
     value, details = evaluate_ca_rule(example_json)
+    print(f'Got these returned:\n{value}\n{details}\n-------------')
 
     print(f"Rule value: {value:.4f}")
     print("Breakdown:")
