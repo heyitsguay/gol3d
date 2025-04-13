@@ -183,6 +183,7 @@ void Application::initGL(int monitorID, int quality, int aaSamples) {
         window_width = 1;
         window_height = 1;
         useMonitor = nullptr;
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
     } else if(quality == QUALITY_LAPTOP) {
         // Always 1366x768, a personal indulgence.
         window_width = 1366;
@@ -194,9 +195,6 @@ void Application::initGL(int monitorID, int quality, int aaSamples) {
     }
 
     // Create the GLFW window, make its context current.
-    if (headlessMode) {
-        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-    }
     window = glfwCreateWindow(window_width, window_height, " ", useMonitor, nullptr);
     if( window == nullptr ) {
         printf("Failed to open GLFW window");
