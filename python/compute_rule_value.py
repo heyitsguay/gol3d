@@ -11,7 +11,7 @@ class CAValueFunction:
     """
 
     def __init__(self,
-                 transient_ratio=0.5,
+                 transient_ratio=0.3,
                  growth_weight=0.4,
                  periodicity_weight=0.4,
                  complexity_weight=0.2,
@@ -38,14 +38,14 @@ class CAValueFunction:
         self.complexity_weight = complexity_weight
         self.ideal_growth_exp = ideal_growth_exp
 
-    def evaluate(self, simulation_json):
+    def evaluate(self, simulation_dict):
         """
         Evaluate a CA rule based on its simulation results
 
         Parameters:
         -----------
-        simulation_json : str
-            Path to simulation results JSON with 'populationRecord' and 'endStatus'
+        simulation_dict : str
+            Simulation results dict with 'populationRecord' and 'endStatus'
 
         Returns:
         --------
@@ -54,8 +54,6 @@ class CAValueFunction:
         dict
             Detailed breakdown of the score components
         """
-        with open(simulation_json, 'r') as fd:
-            simulation_dict = json.load(fd)
         # Check for early termination conditions
         end_status = simulation_dict.get("endStatus", None)
         if end_status in ["explosion", "extinction", "flatline"]:
@@ -280,7 +278,7 @@ def evaluate_ca_rule(simulation_json, **kwargs):
     Parameters:
     -----------
     simulation_json : dict or str
-        Simulation results as dictionary or JSON string
+        Path to simulation results JSON
     **kwargs : dict
         Parameters to pass to CAValueFunction
 
@@ -291,15 +289,14 @@ def evaluate_ca_rule(simulation_json, **kwargs):
     dict
         Detailed breakdown of the score components
     """
-    # Handle string input
-    if isinstance(simulation_json, str):
-        simulation_json = json.loads(simulation_json)
+    with open(simulation_json, 'r') as fd:
+        simulation_dict = json.load(fd)
 
     # Create value function with provided parameters
     value_function = CAValueFunction(**kwargs)
 
     # Evaluate rule
-    return value_function.evaluate(simulation_json)
+    return value_function.evaluate(simulation_dict)
 
 
 if __name__ == "__main__":
