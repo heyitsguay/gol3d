@@ -323,7 +323,7 @@ if __name__ == "__main__":
     # Evaluate with default parameters
     value, details = evaluate_ca_rule(example_json)
 
-    print(f"Rule value: {value:.f}")
+    print(f"Rule value: {value:.3f}")
     print("Breakdown:")
     for key, val in details.items():
         print(f"  {key}: {val}")
