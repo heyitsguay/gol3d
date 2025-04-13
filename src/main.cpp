@@ -45,7 +45,7 @@ float activeCubesNowSmooth = 0;
 const float smoothingFactor = 0.5;
 const float populationGrowthThreshold = 25;
 const float populationDecayThreshold = 0.005;
-const int maxTimeSteps = 1000;
+const int maxTimeSteps = 3000;
 const int logEveryT = 5;
 const std::string filePrefix = "output/2025-04-12/";
 
