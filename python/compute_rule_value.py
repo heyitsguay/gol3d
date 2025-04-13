@@ -300,19 +300,9 @@ def evaluate_ca_rule(simulation_json, **kwargs):
     return value_function.evaluate(simulation_json)
 
 
-# Example usage
 if __name__ == "__main__":
-    # Example simulation result
-    example_json = {
-        "endStatus": None,  # None means simulation completed normally
-        "populationRecord": {
-            "0": {"numActiveCubes": 100},
-            "1": {"numActiveCubes": 105},
-            "2": {"numActiveCubes": 112},
-            # ... more time steps
-            "99": {"numActiveCubes": 500}
-        }
-    }
+    import sys
+    example_json = sys.argv[1]
 
     # Evaluate with default parameters
     value, details = evaluate_ca_rule(example_json)
