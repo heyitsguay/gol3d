@@ -180,7 +180,7 @@ class CAValueFunction:
 
         # Convert to loss (0 to 1 scale)
         max_error = 3.0  # Assuming difference of 3 in exponent is maximum error
-        loss = min(growth_error / max_error, 1.0)
+        loss = np.minimum(growth_error / max_error, 1.0)
 
         return loss
 
@@ -263,7 +263,7 @@ class CAValueFunction:
 
         # Convert to complexity score (higher TV = higher complexity)
         # We cap the maximum TV at 1.0 (average absolute difference of 1.0)
-        complexity_score = min(scaled_tv, 1.0)
+        complexity_score = np.minimum(scaled_tv, 1.0)
 
         # Convert to loss (less complex = higher loss)
         loss = 1.0 - complexity_score
