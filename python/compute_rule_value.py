@@ -326,4 +326,4 @@ if __name__ == "__main__":
     print(f"Rule value: {value:.3f}")
     print("Breakdown:")
     for key, val in details.items():
-        print(f"  {key}: {val}")
+        print(f"  {key}: {val:.3f}")
