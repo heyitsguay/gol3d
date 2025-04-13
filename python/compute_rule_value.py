@@ -167,6 +167,7 @@ class CAValueFunction:
 
             # Calculate slope (exponent b)
             slope = np.polyfit(log_time, log_pop, 1)
+            print(f'Slope is: {slope}')
 
             # Convert to power law parameters
             exponent = slope
