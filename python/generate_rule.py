@@ -6,7 +6,7 @@ import random
 import time
 
 from dataclasses import dataclass
-from typing import Literal
+from typing import Any, Literal
 
 import tqdm
 
@@ -20,6 +20,7 @@ StateType = Literal["dead", "live", "dying"]
 class Rule:
     table: list[list[str]]  # [current_state][next_state] -> CSV / "A" / "C" / "-"
     live_states: set[int]   # bold (neighbour‑counting) states
+    params: dict[str, Any]
 
     def to_json(self, filename: str) -> None:
         """Convert the rule to JSON format and save it to a file.
@@ -30,7 +31,8 @@ class Rule:
         # Create a JSON-serializable dictionary
         data = {
             "table": self.table,
-            "live_states": list(self.live_states)  # Convert set to list for JSON serialization
+            "live_states": list(self.live_states),
+            "params": self.params,
         }
 
         # Write to file
@@ -81,6 +83,13 @@ def generate_rule(
 
     max_nbrs = int(3**n_dims - 1)
 
+    params = {
+        'beta_live': beta_live,
+        'beta_sparse': beta_sparse,
+        'beta_want': beta_want,
+        'beta_unused': beta_unused,
+    }
+
     # ---------- live‑state set -------------------------------------------------
     # Scale beta distribution to get number of live states between 1 and n_states-1
     want_live = clamp(1 + int(rng.betavariate(1, beta_live) * (n_states - 1)), 1, n_states - 1)
@@ -125,7 +134,6 @@ def generate_rule(
             columns_to_fill = targets[:]
         else:
             columns_to_fill = targets[:-1]
-            last_column = targets[-1]
         column_counts = {}
 
         unused_left = len(unused)
@@ -170,7 +178,7 @@ def generate_rule(
             else:
                 table[cur][targets[-1]] = "-"
 
-    return Rule(table, live_states)
+    return Rule(table, live_states, params)
 
 
 def parse_dict_param(param_str: str) -> dict[StateType, float]:
