@@ -179,11 +179,14 @@ void Application::initGL(int monitorID, int quality, int aaSamples) {
 
     int window_width, window_height;
 
-    if(quality == QUALITY_LAPTOP) {
+    if (headlessMode) {
+        window_width = 1;
+        window_height = 1;
+        useMonitor = nullptr;
+    } else if(quality == QUALITY_LAPTOP) {
         // Always 1366x768, a personal indulgence.
         window_width = 1366;
         window_height = 768;
-
     } else {
         // 100% scale. Ideally, you selected QUALITY_BEST to get here.
         window_width = xResolution;
@@ -191,6 +194,9 @@ void Application::initGL(int monitorID, int quality, int aaSamples) {
     }
 
     // Create the GLFW window, make its context current.
+    if (headlessMode) {
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+    }
     window = glfwCreateWindow(window_width, window_height, " ", useMonitor, nullptr);
     if( window == nullptr ) {
         printf("Failed to open GLFW window");
@@ -198,6 +204,7 @@ void Application::initGL(int monitorID, int quality, int aaSamples) {
         abort();
     }
     glfwMakeContextCurrent(window);
+//    glfwHideWindow(window);
 
     // Initialize GLEW.
     glewExperimental = (GLboolean)true;
