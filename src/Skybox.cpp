@@ -19,7 +19,7 @@ Skybox::~Skybox() {
  * Skybox.draw()
  * Draws the Skybox using OpenGL.
  */
-void Skybox::draw() {
+void Skybox::draw(int activeCubes) {
     // Check for input before drawing.
     handleInput();
 
@@ -47,7 +47,8 @@ void Skybox::draw() {
         glClearColor(0.f, 0.f, 0.f, 1.f);
 
     } else if(drawState == DRAW_WHITE) {
-        glClearColor(1.f, 1.f, 1.f, 1.f);
+        // TODO: Make the background change with the active cube count
+        glClearColor(0.85f, 0.75f, 0.79f, 1.f);
     }
 }
 
@@ -75,7 +76,7 @@ void Skybox::init(GLuint *program_, Camera *cam_, float scale_, bool useHD) {
     cam = cam_;
     scale = scale_;
     scaleVec = glm::vec3(scale, scale, scale);
-    drawState = DRAW_BOX;
+    drawState = DRAW_WHITE;
 
     // Set up Skybox cube map.
     // Path to the low-def textures.

@@ -1,6 +1,8 @@
 # Scripts to simplify Git updates.
 push
 
+output/
+
 # Vim/gedit backup files.
 *~
 

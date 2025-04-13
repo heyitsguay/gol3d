@@ -43,8 +43,8 @@ void World::draw(float t) {
 
     // TODO: Make more extensible
     // Texture to apply to dying cubes.
-    const glm::ivec2 state2Tex = typeBase[T_BORDERDYING];
-    const glm::ivec2 state3Tex = typeBase[T_GRAD];
+    const glm::ivec2 state2Tex = typeBase[T_GRAD];
+    const glm::ivec2 state3Tex = typeBase[T_BORDERDYING];
     const glm::ivec2 state4Tex = typeBase[T_GRADDYING];
 
     const float camDist2 = cam.drawDistance * cam.drawDistance;
@@ -231,6 +231,7 @@ void World::initGL() {
     glGenerateMipmap(GL_TEXTURE_2D);
 
     sAtlas = (GLuint)glGetUniformLocation(*program, "s_atlas");
+
 }
 
 /**

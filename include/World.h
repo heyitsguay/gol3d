@@ -42,10 +42,10 @@ public:
     std::vector<glm::ivec2> types;
 
     // Base Cube hue.
-    float baseCubeH = 0.7f;
+    float baseCubeH = 0.5f;
 
     // Determines whether to use flat shading or not.
-    float varyColor = 1.f;
+    float varyColor = 0.5f;
 
     // OpenGL uniform variables.
     GLuint uMVP, uvaryColor, uhBase, ucameraPos, ut;

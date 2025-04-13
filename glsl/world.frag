@@ -27,13 +27,13 @@ vec3 hsv2rgb(vec3 c){
 }
 
 void main() {
-    float scale = 8e-3 / f_scale;
+    float scale = 8e-4 / f_scale;
     vec3 scaled_position = f_position * vec3(scale, scale, scale);
 //    float other = dot(scaled_position, f_normal);
 //    vec3 dcenter = f_position - u_center;
 //    float ddcenter2 = dot(dcenter, dcenter);
 //    float h = fract(dot(scaled_position, vec3(1., 1., 1.)) * u_t + 0.95 * sin(0.5 * (scaled_position.x + abs(dot(scaled_position, vec3(1., 1., 1.)))) * u_t)) + 0.25 * sin(2 * dcenter.y + 0.5 * ddcenter2 * dcenter.x * u_t);
-    float h = fract(u_h_base + u_vary_color * (0.06 * u_t + sqrt(dot(scaled_position, scaled_position))));
+    float h = fract(0.1 + u_h_base + u_vary_color * (0.06 * sin(u_t) + sqrt(dot(scaled_position, scaled_position))));
     float s = 0.7;
 
     vec2 tc = vec2(f_typeCoords) * dTex + f_texCoords;
@@ -41,6 +41,7 @@ void main() {
     // Compute brightness.
     vec3 dposition = u_camera_pos - f_position;
     float costheta = clamp(dot(f_normal, normalize(dposition)), 0., 1.);
-    float v = 0.9*(0.4 + 0.6 * costheta);
-	o_color = hsv2rgb(vec3(h, s, v)) * texture(s_atlas, tc).rgb;
+    float v = 0.9*(0.1 + 0.9 * costheta);
+    float i;
+	o_color = hsv2rgb(vec3(modf(h, i), s, v)) * texture(s_atlas, tc).rgb;
 }

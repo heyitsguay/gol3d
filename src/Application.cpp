@@ -3,6 +3,8 @@
 //
 #include "Application.h"
 
+#include <iostream>
+
 #if defined(POSIX)
 #include <GL/glxew.h>
 #elif defined(_WIN32)
@@ -27,7 +29,7 @@ void Application::draw() {
 
     world.draw((float)t);
 
-    skybox.draw();
+    skybox.draw(getActiveCubes());
 
     user.draw();
 
@@ -53,8 +55,20 @@ void Application::freeGL() {
 }
 
 
-int Application::getActiveCubes() {
+int Application::getActiveCubes() const {
     return (int)world.activeObject->activeCubes.size();
+}
+
+
+std::vector<int> Application::getCubeStateCounts() const {
+    auto gca = dynamic_cast<GeneralizedCellularAutomaton*>(world.activeObject);
+    return gca->stateCounts;
+}
+
+
+std::string Application::getRuleString() const {
+    auto gca = dynamic_cast<GeneralizedCellularAutomaton*>(world.activeObject);
+    return gca->ruleString;
 }
 
 
@@ -87,6 +101,8 @@ void Application::init(
         int aaSamples,
         bool headlessMode_,
         std::vector<float> *cubeCubeProbs) {
+    headlessMode = headlessMode_;
+
     // Initialize OpenGL resources.
     initGL(monitorID, quality, aaSamples);
 
@@ -98,8 +114,6 @@ void Application::init(
 
     // Camera setup.
     cam.init();
-
-    headlessMode = headlessMode_;
 
     // User setup.
     glm::vec3 position0(0, 0, 80);
@@ -333,7 +347,7 @@ void Application::update() {
     // Update the time variable.
 //    double tNew = glfwGetTime();
     t = glfwGetTime();
-    numSteps += 1;
+    numSteps++;
 
     // Handle user input.
     handleInput();

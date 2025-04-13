@@ -75,9 +75,12 @@ public:
     // List of states that count as "alive" when computing live neighbor counts.
     std::set<int> liveStates;
 
-    // Number of Cube states - indicates whether we're in regular Game of Life mode
-    // (2 states) or Brian's brain mode (3 states).
+    // Number of Cube states
     int numStates;
+
+    // Counts the number of active Cubes in each state. `stateCounts[i]` is the count
+    // for Cube state `i`.
+    std::vector<int> stateCounts;
 
     GeneralizedCellularAutomaton();
     ~GeneralizedCellularAutomaton() override;
@@ -87,6 +90,8 @@ public:
     void handleInput() override;
 
     void setCube(Cube *c, int state);
+
+    void recomputeStateCounts();
 
     void setRule(
             const std::vector<std::vector<std::string>> &_ruleMatrixExt,
