@@ -97,7 +97,7 @@ class CAValueFunction:
         v = 1.0 - total_loss
 
         # Ensure value is in [0, 1] range
-        v = max(0.0, min(1.0, v))
+        v = np.clip(v, 0, 1)
 
         # Return value and detailed breakdown
         return v, {
@@ -228,7 +228,7 @@ class CAValueFunction:
 
         # Cap the score at a reasonable maximum
         max_score = np.log1p(50)
-        periodicity_score = min(periodicity_score, max_score)
+        periodicity_score = np.minimum(periodicity_score, max_score)
 
         # Convert to loss (0 to 1 scale, where higher periodicity = higher loss)
         loss = periodicity_score / max_score
