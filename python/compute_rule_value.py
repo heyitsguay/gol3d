@@ -94,9 +94,12 @@ class CAValueFunction:
         growth_loss = self._growth_rate_loss(steady_population)
         periodicity_loss = self._periodicity_loss(steady_population)
         complexity_loss = self._complexity_loss(steady_population)
+        # No early termination
+        early_termination_loss = 0
 
         # Compute weighted total loss
         total_loss = (
+                self.early_termination_weight * early_termination_loss +
                 self.growth_weight * growth_loss +
                 self.periodicity_weight * periodicity_loss +
                 self.complexity_weight * complexity_loss
@@ -107,6 +110,7 @@ class CAValueFunction:
 
         # Return value and detailed breakdown
         return v, {
+            "early_termination_loss": early_termination_loss,
             "growth_loss": growth_loss,
             "periodicity_loss": periodicity_loss,
             "complexity_loss": complexity_loss,
@@ -122,8 +126,10 @@ class CAValueFunction:
 
         time_steps = sorted([int(k) for k in population_record.keys()])
         max_observed_step = max(time_steps)
-        observed_fraction = max_observed_step / max_steps
-        return (1 / (0.1 + observed_fraction))**2
+        observed_fraction = np.clip(max_observed_step / max_steps, 0.1, 1)
+        # Set offset so that loss goes to 0 as observed_fraction goes to 1
+        offset = 1
+        return (1 / observed_fraction)**2 - offset
 
     @staticmethod
     def _extract_population(simulation_json):
