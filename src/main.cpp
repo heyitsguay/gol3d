@@ -40,10 +40,11 @@ std::vector<int> timeStepLog;
 int activeCubesInit = 0;
 int activeCubesNow = 0;
 int prevActiveCubes = -1;
-int prevPrevActiveCubes;
+int prevPrevActiveCubes = -1;
+int prevPrevPrevActiveCubes;
 float activeCubesNowSmooth = 0;
 const float smoothingFactor = 0.5;
-const float populationGrowthThreshold = 25;
+const float populationGrowthThreshold = 35;
 const float populationDecayThreshold = 0.005;
 const int maxTimeSteps = 3000;
 const int logEveryT = 5;
@@ -162,6 +163,7 @@ bool updateCubeStats(Application &app, const std::string &saveFile) {
     activeCubeLog.push_back(numActiveCubes);
     timeStepLog.push_back(app.numSteps);
 
+    prevPrevPrevActiveCubes = prevPrevActiveCubes;
     prevPrevActiveCubes = prevActiveCubes;
     prevActiveCubes = numActiveCubes;
 
@@ -176,7 +178,7 @@ bool updateCubeStats(Application &app, const std::string &saveFile) {
     std::string endStatus;
     bool explosion = populationRatio > populationGrowthThreshold;
     bool extinction = populationRatio < populationDecayThreshold;
-    bool flatline = (prevPrevActiveCubes == prevActiveCubes) && (prevActiveCubes == numActiveCubes);
+    bool flatline = (prevPrevPrevActiveCubes == prevPrevActiveCubes) && (prevPrevActiveCubes == prevActiveCubes) && (prevActiveCubes == numActiveCubes);
     bool reachedEnd = app.numSteps >= maxTimeSteps;
     if (explosion) {
         endStatus = "explosion";
