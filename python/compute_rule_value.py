@@ -44,8 +44,8 @@ class CAValueFunction:
 
         Parameters:
         -----------
-        simulation_json : dict
-            Simulation results dictionary with 'populationRecord' and 'endStatus'
+        simulation_json : str
+            Path to simulation results JSON with 'populationRecord' and 'endStatus'
 
         Returns:
         --------
@@ -54,8 +54,10 @@ class CAValueFunction:
         dict
             Detailed breakdown of the score components
         """
+        with open(simulation_json, 'r') as fd:
+            simulation_dict = json.load(fd)
         # Check for early termination conditions
-        end_status = simulation_json.get("endStatus", None)
+        end_status = simulation_dict.get("endStatus", None)
         if end_status in ["explosion", "extinction", "flatline"]:
             return 0.0, {
                 "reason": f"Early termination: {end_status}",
@@ -67,7 +69,7 @@ class CAValueFunction:
             }
 
         # Extract population time series
-        population_series = self._extract_population(simulation_json)
+        population_series = self._extract_population(simulation_dict)
 
         if population_series.size < 10:
             # Not enough data points for meaningful analysis
