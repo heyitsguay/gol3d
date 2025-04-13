@@ -129,7 +129,7 @@ class CAValueFunction:
         observed_fraction = np.clip(max_observed_step / max_steps, 0.1, 1)
         # Set offset so that loss goes to 0 as observed_fraction goes to 1
         offset = 1
-        return (1 / observed_fraction)**2 - offset
+        return ((1 / observed_fraction)**2 - offset)**0.5
 
     @staticmethod
     def _extract_population(simulation_json):
