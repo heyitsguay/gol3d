@@ -204,7 +204,7 @@ if __name__ == "__main__":
                         help="Number of states (>= 3, state 0 is always dead) (default: 5)")
     parser.add_argument("--beta_live", type=float, default=2.0,
                         help="Bias parameter for live states; higher values mean fewer live states (default: 2.0)")
-    parser.add_argument("--beta_sparse", type=str, default="dead:4,live:2,dying:1.5",
+    parser.add_argument("--beta_sparse", type=str, default="dead:4,live:1.4,dying:1",
                         help="Bias parameters for non-empty targets by state type (default: dead:1.2,live:1.5,dying:2.0)")
     parser.add_argument("--beta_want", type=str, default="dead:6.0,live:5.0,dying:2.5",
                         help="Bias parameters for neighbor counts by state type (default: dead:2.0,live:3.0,dying:1.5)")

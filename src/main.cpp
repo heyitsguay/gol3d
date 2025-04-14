@@ -278,7 +278,7 @@ int main(int argc, char **argv) {
     gol.cubeCube(hwidth, defaultCubeCubeProbs, origin);
 
     std::string ruleString = gol.ruleString;
-    std::cout << ruleString;
+    std::cout << ruleString << "\n";
     if (!readInput) {
         saveFile = stringToJSONFilename(filePrefix, ruleString);
     }
